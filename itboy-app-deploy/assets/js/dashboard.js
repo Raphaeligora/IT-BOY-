@@ -8,6 +8,7 @@
   var bannerZone = document.getElementById('banner-zone');
   var limitNoteEl = document.getElementById('plan-limit-note');
   var suggestionsSection = document.getElementById('suggestions-section');
+  var todayProgressEl = document.getElementById('today-progress');
   var listEl = document.getElementById('habit-list');
   var addToggleBtn = document.getElementById('add-habit-toggle');
   var addForm = document.getElementById('add-habit-form');
@@ -27,6 +28,38 @@
   function renderLimitNote() {
     limitNoteEl.textContent = habits.length + '/' + planLimit() + ' habitudes actives - plan ' +
       (profile.plan === 'premium' ? 'Premium' : 'Free') + '.';
+  }
+
+  // 7 derniers jours (dont aujourd'hui), du plus ancien au plus recent -
+  // sert au mini historique par habitude et reutilise todayStr comme
+  // seule source de verite pour "aujourd'hui" (coherent avec le reste).
+  function lastNDaysStr(n) {
+    var pad = function (x) { return String(x).padStart(2, '0'); };
+    var parts = todayStr.split('-').map(Number);
+    var base = new Date(parts[0], parts[1] - 1, parts[2]);
+    var out = [];
+    for (var i = n - 1; i >= 0; i--) {
+      var d = new Date(base);
+      d.setDate(base.getDate() - i);
+      out.push(d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()));
+    }
+    return out;
+  }
+
+  function renderTodayProgress() {
+    if (!todayProgressEl) return;
+    if (!habits.length) { todayProgressEl.innerHTML = ''; return; }
+
+    var doneCount = habits.filter(function (h) {
+      return (logsByHabit[h.id] || []).indexOf(todayStr) !== -1;
+    }).length;
+    var pct = Math.round((doneCount / habits.length) * 100);
+
+    todayProgressEl.innerHTML =
+      '<div class="today-progress">' +
+      '<div class="today-progress-track"><div class="today-progress-fill" style="width:' + pct + '%"></div></div>' +
+      '<span class="today-progress-label">' + doneCount + '/' + habits.length + ' faites</span>' +
+      '</div>';
   }
 
   async function renderSuggestions() {
@@ -83,6 +116,7 @@
       logsByHabit[habit.id] = [];
       renderLimitNote();
       renderHabitList();
+      renderTodayProgress();
       await renderSuggestions();
     } catch (err) {
       window.ITBOY.ui.showError(bannerZone, err);
@@ -95,15 +129,21 @@
       return;
     }
 
+    var week = lastNDaysStr(7);
+
     listEl.innerHTML = habits.map(function (h) {
       var dates = logsByHabit[h.id] || [];
       var doneToday = dates.indexOf(todayStr) !== -1;
       var streak = window.ITBOY.streak.computeCurrentStreak(dates, todayStr);
+      var weekDots = week.map(function (d) {
+        return '<span class="d' + (dates.indexOf(d) !== -1 ? ' done' : '') + '"></span>';
+      }).join('');
       return '<div class="habit-row" data-habit-id="' + h.id + '">' +
         '<button class="habit-checkbox' + (doneToday ? ' done' : '') + '" data-action="toggle" aria-label="Fait aujourd\'hui"></button>' +
         '<div class="info">' +
         '<span class="name">' + window.ITBOY.ui.escapeHtml(h.name) + '</span>' +
         '<span class="category">' + (window.ITBOY.CATEGORY_LABELS[h.category] || h.category) + '</span>' +
+        '<div class="mini-week" aria-hidden="true">' + weekDots + '</div>' +
         '</div>' +
         '<div class="streak-indicator"><span class="dot"></span>' + streak + '</div>' +
         '<a class="detail-link" href="../habits/?id=' + h.id + '">Detail</a>' +
@@ -133,6 +173,7 @@
         logsByHabit[habitId] = dates.concat([todayStr]);
       }
       renderHabitList();
+      renderTodayProgress();
     } catch (err) {
       window.ITBOY.ui.showError(bannerZone, err);
     }
@@ -145,6 +186,7 @@
       habits = habits.filter(function (h) { return h.id !== habitId; });
       renderLimitNote();
       renderHabitList();
+      renderTodayProgress();
       await renderSuggestions();
     } catch (err) {
       window.ITBOY.ui.showError(bannerZone, err);
@@ -185,6 +227,7 @@
       addForm.style.display = 'none';
       renderLimitNote();
       renderHabitList();
+      renderTodayProgress();
     } catch (err) {
       window.ITBOY.ui.showError(bannerZone, err);
     }
@@ -223,6 +266,7 @@
 
       renderLimitNote();
       renderHabitList();
+      renderTodayProgress();
       await renderSuggestions();
     } catch (err) {
       window.ITBOY.ui.showError(bannerZone, err);
