@@ -1,11 +1,11 @@
-/* IT BOY — Écran /plans */
+/* IT BOY — Ecran /plans */
 
 (function () {
   var bannerZone = document.getElementById('banner-zone');
   var recapEl = document.getElementById('suggested-recap');
   var gridEl = document.getElementById('plans-grid');
 
-  function renderPlans() {
+  function renderPlans(user) {
     gridEl.innerHTML = window.ITBOY.PLANS.map(function (plan) {
       var cls = 'plan-card' + (plan.highlighted ? ' highlighted' : '');
       var features = plan.features.map(function (f) { return '<li>' + f + '</li>'; }).join('');
@@ -18,7 +18,17 @@
     }).join('');
 
     gridEl.querySelectorAll('button[data-plan]').forEach(function (btn) {
-      btn.addEventListener('click', function () {
+      btn.addEventListener('click', async function () {
+        btn.disabled = true;
+
+        if (user) {
+          try {
+            await window.ITBOY.api.markOnboarded(user.id);
+          } catch (e) {
+            console.warn('[itboy] echec du marquage onboarded :', e);
+          }
+        }
+
         if (btn.getAttribute('data-plan') === 'premium') {
           window.location.href = '../checkout/';
         } else {
@@ -50,7 +60,7 @@
   async function init() {
     if (!window.ITBOY.isSupabaseConfigured) {
       window.ITBOY.ui.showConfigBanner(bannerZone);
-      renderPlans();
+      renderPlans(null);
       recapEl.style.display = 'none';
       return;
     }
@@ -58,7 +68,7 @@
     var user = await window.ITBOY.auth.requireUser('../login/');
     if (!user) return;
 
-    renderPlans();
+    renderPlans(user);
     renderSuggestedRecap(user);
   }
 
