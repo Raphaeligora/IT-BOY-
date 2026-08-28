@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Mon tracker — IT BOY</title>
+<title>Mon tracker - IT BOY</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet" />
@@ -16,7 +16,7 @@
     <a href="../" class="logo-mark" style="font-size:20px">
       <span class="i">I</span><span class="b">B</span>
     </a>
-    <button class="link-muted" id="logout-btn" type="button" style="background:none;border:none;cursor:pointer;font-family:Montserrat,sans-serif">Se déconnecter</button>
+    <button class="link-muted" id="logout-btn" type="button" style="background:none;border:none;cursor:pointer;font-family:Montserrat,sans-serif">Se deconnecter</button>
   </div>
 
   <div id="banner-zone" style="width:100%;max-width:640px"></div>
@@ -26,6 +26,7 @@
   <div id="suggestions-section"></div>
 
   <div class="section-heading">Aujourd'hui</div>
+  <div id="today-progress"></div>
   <div class="habit-list" id="habit-list"></div>
 
   <button class="add-habit-btn" id="add-habit-toggle" type="button">+ Ajouter une habitude</button>
@@ -34,15 +35,15 @@
     <label class="form-label">Nom
       <input class="form-input" type="text" name="name" required />
     </label>
-    <label class="form-label">Catégorie
+    <label class="form-label">Categorie
       <select class="form-select" name="category" required>
-        <option value="sante">Santé</option>
-        <option value="productivite">Productivité</option>
+        <option value="sante">Sante</option>
+        <option value="productivite">Productivite</option>
         <option value="mindset">Mindset &amp; discipline</option>
         <option value="finance">Finances</option>
       </select>
     </label>
-    <label class="form-label">Fréquence
+    <label class="form-label">Frequence
       <select class="form-select" name="frequency" id="frequency-select">
         <option value="daily">Quotidienne</option>
         <option value="weekly">X fois par semaine</option>
