@@ -1,20 +1,28 @@
--- IT BOY — Schéma Supabase (compte, plans, tracker d'habitudes)
--- À coller intégralement dans Supabase → SQL Editor → New query → Run,
--- une fois le projet Supabase créé (voir README.md à la racine du repo).
+-- IT BOY - Schema Supabase (compte, plans, tracker d'habitudes)
+-- A coller integralement dans Supabase -> SQL Editor -> New query -> Run,
+-- une fois le projet Supabase cree (voir README.md a la racine du repo).
 --
 -- Couvre : profiles, quiz_sessions, habits, habit_logs + RLS +
--- application de la limite de plan CÔTÉ BASE (pas seulement côté front,
+-- application de la limite de plan COTE BASE (pas seulement cote front,
 -- comme l'exige prompt-compte-tracker-itboy.md section 5).
 
 create extension if not exists pgcrypto;
 
 -- ============================================================
--- 1. profiles — un profil par utilisateur, plan free/premium
+-- 1. profiles - un profil par utilisateur, plan free/premium
+--    email : copie de auth.users.email, tenue a jour par trigger,
+--    pour pouvoir contacter chaque inscrit depuis la base sans
+--    devoir interroger auth.users (non accessible via l'API REST).
+--    onboarded : passe a true par /plans une fois qu'un plan est
+--    choisi, pour ne plus jamais renvoyer l'utilisateur vers cet
+--    ecran aux connexions suivantes.
 -- ============================================================
 
 create table if not exists public.profiles (
   id uuid primary key references auth.users (id) on delete cascade,
   plan text not null default 'free' check (plan in ('free', 'premium')),
+  email text,
+  onboarded boolean not null default false,
   created_at timestamptz not null default now()
 );
 
@@ -28,18 +36,18 @@ create policy "profiles_update_own"
   on public.profiles for update
   using (auth.uid() = id);
 
--- Création automatique du profil (plan='free') à l'inscription.
--- C'est la ligne prévue par le spec ("Créer une ligne dans profiles
--- avec plan = 'free' par défaut"), faite côté serveur via trigger —
--- jamais par un insert client, pour éviter qu'un utilisateur choisisse
--- son propre plan à l'inscription.
+-- Creation automatique du profil (plan='free') a l'inscription, avec
+-- copie de l'email. C'est la ligne prevue par le spec ("Creer une
+-- ligne dans profiles avec plan = 'free' par defaut"), faite cote
+-- serveur via trigger - jamais par un insert client, pour eviter
+-- qu'un utilisateur choisisse son propre plan a l'inscription.
 create or replace function public.handle_new_user()
 returns trigger
 language plpgsql
 security definer set search_path = public
 as $$
 begin
-  insert into public.profiles (id, plan) values (new.id, 'free');
+  insert into public.profiles (id, plan, email) values (new.id, 'free', new.email);
   return new;
 end;
 $$;
@@ -49,10 +57,28 @@ create trigger on_auth_user_created
   after insert on auth.users
   for each row execute procedure public.handle_new_user();
 
+-- Garde profiles.email synchronise si l'utilisateur change son email
+-- (confirmation d'un nouvel email cote Supabase Auth).
+create or replace function public.sync_user_email()
+returns trigger
+language plpgsql
+security definer set search_path = public
+as $$
+begin
+  update public.profiles set email = new.email where id = new.id;
+  return new;
+end;
+$$;
+
+drop trigger if exists on_auth_user_email_updated on auth.users;
+create trigger on_auth_user_email_updated
+  after update of email on auth.users
+  for each row execute procedure public.sync_user_email();
+
 -- ============================================================
--- 2. quiz_sessions — réponses au quiz + habitudes suggérées
---    Créée de façon anonyme (avant inscription), reliée à un
---    user_id une fois le compte créé.
+-- 2. quiz_sessions - reponses au quiz + habitudes suggerees
+--    Creee de facon anonyme (avant inscription), reliee a un
+--    user_id une fois le compte cree.
 -- ============================================================
 
 create table if not exists public.quiz_sessions (
@@ -66,8 +92,8 @@ create table if not exists public.quiz_sessions (
 
 alter table public.quiz_sessions enable row level security;
 
--- Insert anonyme autorisé (l'id, un UUID v4, sert de secret de session
--- côté client — non énumérable). Aucune donnée sensible n'y est stockée.
+-- Insert anonyme autorise (l'id, un UUID v4, sert de secret de session
+-- cote client - non enumerable). Aucune donnee sensible n'y est stockee.
 create policy "quiz_sessions_insert_anon"
   on public.quiz_sessions for insert
   with check (user_id is null);
@@ -76,14 +102,14 @@ create policy "quiz_sessions_select_own_or_anon"
   on public.quiz_sessions for select
   using (user_id is null or auth.uid() = user_id);
 
--- Permet de relier une session anonyme au compte qui vient d'être créé.
+-- Permet de relier une session anonyme au compte qui vient d'etre cree.
 create policy "quiz_sessions_claim"
   on public.quiz_sessions for update
   using (user_id is null)
   with check (auth.uid() = user_id);
 
 -- ============================================================
--- 3. habits — habitudes actives/archivées d'un utilisateur
+-- 3. habits - habitudes actives/archivees d'un utilisateur
 -- ============================================================
 
 create table if not exists public.habits (
@@ -116,10 +142,10 @@ create policy "habits_delete_own"
   on public.habits for delete
   using (auth.uid() = user_id);
 
--- Règle métier critique (spec section 5) : nombre d'habitudes actives
--- limité par le plan (3 en free, 10 en premium), vérifié EN BASE — un
--- appel direct à l'API REST Supabase ne peut donc pas contourner un
--- bouton désactivé côté front.
+-- Regle metier critique (spec section 5) : nombre d'habitudes actives
+-- limite par le plan (3 en free, 10 en premium), verifie EN BASE - un
+-- appel direct a l'API REST Supabase ne peut donc pas contourner un
+-- bouton desactive cote front.
 create or replace function public.enforce_habit_limit()
 returns trigger
 language plpgsql
@@ -155,7 +181,7 @@ create trigger habits_enforce_limit
   for each row execute procedure public.enforce_habit_limit();
 
 -- ============================================================
--- 4. habit_logs — un log = un jour complété pour une habitude
+-- 4. habit_logs - un log = un jour complete pour une habitude
 -- ============================================================
 
 create table if not exists public.habit_logs (
@@ -186,3 +212,13 @@ create policy "habit_logs_delete_own"
 
 create index if not exists habit_logs_habit_id_idx on public.habit_logs (habit_id);
 create index if not exists habits_user_id_idx on public.habits (user_id);
+
+-- ============================================================
+-- 5. Migration pour un projet Supabase deja provisionne AVANT
+--    l'ajout de profiles.email / profiles.onboarded (aout 2026).
+--    Sans effet si les colonnes existent deja.
+-- ============================================================
+
+alter table public.profiles add column if not exists email text;
+alter table public.profiles add column if not exists onboarded boolean not null default false;
+update public.profiles p set email = u.email from auth.users u where p.id = u.id and p.email is null;
