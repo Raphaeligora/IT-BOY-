@@ -5,6 +5,6 @@
    définies dans supabase/schema.sql) : pas un secret à cacher. */
 
 window.ITBOY_CONFIG = {
-  SUPABASE_URL: 'REPLACE_WITH_SUPABASE_URL',
-  SUPABASE_ANON_KEY: 'REPLACE_WITH_SUPABASE_ANON_KEY'
+  SUPABASE_URL: 'https://gzuyfalpcpupioobrmeb.supabase.co/rest/v1/',
+  SUPABASE_ANON_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd6dXlmYWxwY3B1cGlvb2JybWViIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc5MzYwOTYsImV4cCI6MjEwMzUxMjA5Nn0.zmmYUd2ig6eMc358wF2fcLqqMu3veynI4vVqXFO0x-4'
 };
