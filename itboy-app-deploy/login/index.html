@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Se connecter — IT BOY</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../assets/css/style.css" />
+</head>
+<body>
+
+<div class="page-shell">
+  <a href="../" class="logo-mark" style="font-size:22px">
+    <span class="i">I</span><span class="b">B</span>
+  </a>
+  <h1 class="page-title font-cinzel">Se connecter</h1>
+  <p class="page-subtitle">Retrouve ton plan et tes habitudes.</p>
+
+  <div id="banner-zone" style="width:100%;max-width:380px"></div>
+
+  <form class="form" id="login-form">
+    <label class="form-label">Email
+      <input class="form-input" type="email" name="email" required autocomplete="email" />
+    </label>
+    <label class="form-label">Mot de passe
+      <input class="form-input" type="password" name="password" required autocomplete="current-password" />
+    </label>
+    <button class="cta-btn" type="submit" id="submit-btn" style="margin-top:8px">Se connecter</button>
+  </form>
+
+  <p class="form-note">Pas encore de compte ? <a href="../signup/">Créer un compte</a></p>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../assets/js/lib/config.js"></script>
+<script src="../assets/js/lib/supabaseClient.js"></script>
+<script src="../assets/js/lib/ui.js"></script>
+<script src="../assets/js/lib/auth.js"></script>
+<script src="../assets/js/login.js"></script>
+</body>
+</html>

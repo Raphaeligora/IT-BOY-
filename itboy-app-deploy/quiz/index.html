@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quiz — IT BOY</title>
+<meta name="description" content="Réponds à 5 questions pour recevoir ton plan d'habitudes IT BOY." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../assets/css/style.css" />
+</head>
+<body>
+
+<div class="quiz-shell">
+  <div class="quiz-header">
+    <a href="../" class="logo-mark" style="font-size:20px;align-self:center;margin-bottom:8px">
+      <span class="i">I</span><span class="b">B</span>
+    </a>
+    <div class="progress-track"><div class="progress-fill" id="progress-fill" style="width:20%"></div></div>
+    <div class="progress-label">
+      <span id="progress-text">Question 1/5</span>
+    </div>
+  </div>
+
+  <div class="question-card" id="question-card"></div>
+
+  <button class="skip-link" id="skip-btn" type="button">Passer</button>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../assets/js/lib/config.js"></script>
+<script src="../assets/js/lib/supabaseClient.js"></script>
+<script src="../assets/js/lib/habitCatalog.js"></script>
+<script src="../assets/js/lib/mapping.js"></script>
+<script src="../assets/js/lib/storage.js"></script>
+<script src="../assets/js/quiz.js"></script>
+</body>
+</html>

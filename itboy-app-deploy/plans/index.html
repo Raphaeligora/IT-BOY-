@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Choisir mon plan — IT BOY</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../assets/css/style.css" />
+</head>
+<body>
+
+<div class="page-shell">
+  <a href="../" class="logo-mark" style="font-size:22px">
+    <span class="i">I</span><span class="b">B</span>
+  </a>
+  <h1 class="page-title font-cinzel">Choisis ton plan</h1>
+  <p class="page-subtitle">Le nombre d'habitudes actives dépend du plan choisi.</p>
+
+  <div id="banner-zone" style="width:100%;max-width:640px"></div>
+
+  <p class="suggested-habits-recap" id="suggested-recap"></p>
+
+  <div class="plans-grid" id="plans-grid"></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../assets/js/lib/config.js"></script>
+<script src="../assets/js/lib/supabaseClient.js"></script>
+<script src="../assets/js/lib/ui.js"></script>
+<script src="../assets/js/lib/auth.js"></script>
+<script src="../assets/js/lib/api.js"></script>
+<script src="../assets/js/lib/plans.js"></script>
+<script src="../assets/js/lib/habitCatalog.js"></script>
+<script src="../assets/js/plans.js"></script>
+</body>
+</html>

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Détail habitude — IT BOY</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../assets/css/style.css" />
+</head>
+<body>
+
+<div class="page-shell">
+  <a href="../dashboard/" class="link-muted" style="align-self:flex-start;max-width:640px;width:100%;margin-bottom:8px">← Retour au tracker</a>
+
+  <div id="banner-zone" style="width:100%;max-width:460px"></div>
+
+  <h1 class="page-title font-cinzel" id="habit-name" style="max-width:20ch">…</h1>
+  <p class="page-subtitle" id="habit-category"></p>
+
+  <div class="habit-stats" id="habit-stats"></div>
+
+  <div class="heatmap" id="heatmap"></div>
+  <p class="plan-note" id="heatmap-caption">30 derniers jours</p>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../assets/js/lib/config.js"></script>
+<script src="../assets/js/lib/supabaseClient.js"></script>
+<script src="../assets/js/lib/ui.js"></script>
+<script src="../assets/js/lib/auth.js"></script>
+<script src="../assets/js/lib/api.js"></script>
+<script src="../assets/js/lib/streak.js"></script>
+<script src="../assets/js/lib/habitCatalog.js"></script>
+<script src="../assets/js/habitDetail.js"></script>
+</body>
+</html>

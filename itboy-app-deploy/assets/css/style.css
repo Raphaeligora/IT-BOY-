@@ -1,0 +1,581 @@
+/* IT BOY — feuille de style partagée (landing + quiz)
+   Charte : voir design-guidelines.md à la racine du repo. */
+
+:root {
+  --bg-deep: #0A1322;
+  --bg-card: #101C2E;
+  --gold: #CDA34E;
+  --white: #F6F6F6;
+  --grey: #8A8A8A;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg-deep);
+  color: var(--white);
+  font-family: 'Montserrat', sans-serif;
+}
+
+a { color: var(--gold); text-decoration: none; }
+::selection { background: var(--gold); color: var(--bg-deep); }
+
+.font-cinzel { font-family: 'Cinzel', serif; }
+
+/* Bouton CTA doré — utilisé sur la landing et dans le quiz */
+.cta-btn {
+  background: var(--gold);
+  color: var(--bg-deep);
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  padding: 19px 46px;
+  min-height: 56px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 2px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.cta-btn:hover { background: var(--white); }
+.cta-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.link-muted {
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  color: var(--grey);
+  transition: color 0.2s;
+}
+.link-muted:hover { color: var(--white); }
+
+.social-icon {
+  width: 44px;
+  height: 44px;
+  border: 1px solid rgba(205,163,78,0.4);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Cinzel', serif;
+  font-size: 12px;
+  color: var(--gold);
+  transition: border-color 0.2s;
+}
+.social-icon:hover { border-color: var(--gold); }
+
+/* Logo IT BOY (monogramme IB + wordmark) */
+.logo-mark { display: flex; align-items: baseline; font-family: 'Cinzel', serif; line-height: 1; }
+.logo-mark .i { color: var(--white); }
+.logo-mark .b { color: var(--gold); margin-left: -5px; }
+.logo-word { font-family: 'Cinzel', serif; color: var(--white); padding-left: 0.42em; }
+
+/* ---- Quiz ---- */
+.quiz-shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 28px 22px 64px;
+  background: radial-gradient(120% 70% at 50% 8%, #14243C 0%, #0A1322 62%);
+}
+
+.quiz-header {
+  width: 100%;
+  max-width: 480px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  margin-bottom: 56px;
+}
+
+.progress-track {
+  width: 100%;
+  height: 2px;
+  background: rgba(246,246,246,0.12);
+  position: relative;
+  overflow: hidden;
+}
+.progress-fill {
+  position: absolute;
+  top: 0; left: 0; bottom: 0;
+  background: var(--gold);
+  transition: width 0.35s ease;
+}
+
+.progress-label {
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--grey);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.question-card {
+  width: 100%;
+  max-width: 480px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  animation: fadeIn 0.35s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.question-title {
+  font-family: 'Cinzel', serif;
+  font-weight: 500;
+  font-size: clamp(22px, 6vw, 30px);
+  line-height: 1.3;
+  letter-spacing: 0.01em;
+  margin: 0 0 40px;
+  max-width: 20ch;
+}
+
+.options-list {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.option-btn {
+  width: 100%;
+  background: var(--bg-card);
+  color: var(--white);
+  border: 1px solid rgba(246,246,246,0.1);
+  border-radius: 2px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 15px;
+  text-align: left;
+  padding: 18px 22px;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+.option-btn:hover { border-color: var(--gold); }
+.option-btn.selected { border-color: var(--gold); background: #14243C; color: var(--gold); }
+
+.skip-link {
+  margin-top: 48px;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  color: var(--grey);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: 'Montserrat', sans-serif;
+  transition: color 0.2s;
+}
+.skip-link:hover { color: var(--white); }
+
+/* ---- Résultat ---- */
+.result-shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 64px 22px 96px;
+  background: radial-gradient(120% 70% at 50% 8%, #14243C 0%, #0A1322 62%);
+}
+
+.result-title {
+  font-family: 'Cinzel', serif;
+  font-weight: 600;
+  font-size: clamp(28px, 8vw, 40px);
+  line-height: 1.2;
+  text-align: center;
+  margin: 24px 0 12px;
+  max-width: 16ch;
+}
+
+.result-subtitle {
+  font-size: 15px;
+  color: var(--grey);
+  text-align: center;
+  max-width: 34ch;
+  margin: 0 0 48px;
+  line-height: 1.6;
+}
+
+.habit-grid {
+  width: 100%;
+  max-width: 560px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 48px;
+}
+
+.habit-card {
+  background: var(--bg-card);
+  border: 1px solid rgba(205,163,78,0.4);
+  border-radius: 2px;
+  padding: 20px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.habit-card .name {
+  font-family: 'Cinzel', serif;
+  font-size: 16px;
+  letter-spacing: 0.01em;
+  color: var(--white);
+}
+
+.habit-card .category {
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+
+.plan-note {
+  font-size: 12px;
+  color: var(--grey);
+  text-align: center;
+  margin-top: 22px;
+  max-width: 34ch;
+  line-height: 1.6;
+}
+
+/* ---- Écrans génériques (auth, plans, dashboard) ---- */
+.page-shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 48px 22px 96px;
+  background: radial-gradient(120% 70% at 50% 8%, #14243C 0%, #0A1322 62%);
+}
+
+.page-title {
+  font-family: 'Cinzel', serif;
+  font-weight: 600;
+  font-size: clamp(26px, 7vw, 36px);
+  line-height: 1.25;
+  text-align: center;
+  margin: 24px 0 8px;
+}
+
+.page-subtitle {
+  font-size: 14px;
+  color: var(--grey);
+  text-align: center;
+  max-width: 36ch;
+  margin: 0 0 40px;
+  line-height: 1.6;
+}
+
+/* Bandeaux d'état */
+.banner-warning, .banner-error, .banner-info {
+  width: 100%;
+  max-width: 420px;
+  border: 1px solid rgba(205,163,78,0.4);
+  background: var(--bg-card);
+  color: var(--white);
+  font-size: 13px;
+  line-height: 1.6;
+  padding: 16px 18px;
+  border-radius: 2px;
+  margin-bottom: 24px;
+}
+.banner-warning code, .banner-error code, .banner-info code {
+  color: var(--gold);
+  font-family: monospace;
+}
+.banner-error { border-color: rgba(220,90,90,0.5); }
+
+/* Formulaires */
+.form {
+  width: 100%;
+  max-width: 380px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.form-label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--grey);
+}
+
+.form-input, .form-select {
+  background: var(--bg-card);
+  border: 1px solid rgba(246,246,246,0.14);
+  color: var(--white);
+  font-family: 'Montserrat', sans-serif;
+  font-size: 15px;
+  padding: 14px 16px;
+  border-radius: 2px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.form-input:focus, .form-select:focus { border-color: var(--gold); }
+
+.form-note {
+  text-align: center;
+  font-size: 13px;
+  color: var(--grey);
+  margin-top: 24px;
+}
+
+/* Cartes de plan */
+.plans-grid {
+  width: 100%;
+  max-width: 720px;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+}
+@media (min-width: 640px) {
+  .plans-grid { grid-template-columns: 1fr 1fr; }
+}
+
+.plan-card {
+  background: var(--bg-card);
+  border: 1px solid rgba(246,246,246,0.1);
+  border-radius: 2px;
+  padding: 32px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.plan-card.highlighted { border-color: var(--gold); }
+
+.plan-card .plan-name {
+  font-family: 'Cinzel', serif;
+  font-size: 20px;
+  color: var(--white);
+}
+.plan-card .plan-price {
+  font-size: 14px;
+  color: var(--gold);
+  letter-spacing: 0.06em;
+}
+.plan-card ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  font-size: 14px;
+  color: var(--grey);
+}
+.plan-card ul li::before {
+  content: '— ';
+  color: var(--gold);
+}
+
+.suggested-habits-recap {
+  width: 100%;
+  max-width: 720px;
+  margin-bottom: 32px;
+  font-size: 13px;
+  color: var(--grey);
+  text-align: center;
+  line-height: 1.8;
+}
+.suggested-habits-recap strong { color: var(--white); font-weight: 500; }
+
+/* Dashboard */
+.dashboard-header {
+  width: 100%;
+  max-width: 640px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 40px;
+}
+
+.plan-limit-note {
+  width: 100%;
+  max-width: 640px;
+  font-size: 12px;
+  color: var(--grey);
+  margin-bottom: 20px;
+}
+
+.habit-list {
+  width: 100%;
+  max-width: 640px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 32px;
+}
+
+.habit-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: var(--bg-card);
+  border: 1px solid rgba(246,246,246,0.1);
+  border-radius: 2px;
+  padding: 16px 18px;
+}
+
+.habit-checkbox {
+  width: 22px;
+  height: 22px;
+  flex: none;
+  border: 1px solid rgba(205,163,78,0.6);
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+  position: relative;
+  transition: background 0.2s;
+}
+.habit-checkbox.done { background: var(--gold); }
+.habit-checkbox.done::after {
+  content: '';
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 8px; height: 8px;
+  background: var(--bg-deep);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.habit-row .info { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+.habit-row .info .name { font-size: 15px; color: var(--white); }
+.habit-row .info .category { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--grey); }
+
+.streak-indicator {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--gold);
+  font-family: 'Cinzel', serif;
+}
+.streak-indicator .dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--gold);
+}
+
+.habit-row .archive-btn {
+  background: none;
+  border: none;
+  color: var(--grey);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+.habit-row .archive-btn:hover { color: var(--white); }
+
+.habit-row a.detail-link {
+  color: var(--grey);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+}
+.habit-row a.detail-link:hover { color: var(--white); }
+
+.suggestion-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: var(--bg-card);
+  border: 1px dashed rgba(205,163,78,0.4);
+  border-radius: 2px;
+  padding: 16px 18px;
+}
+.suggestion-row .info { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+.suggestion-row .info .name { font-size: 15px; color: var(--white); }
+.suggestion-row .info .category { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--grey); }
+.activate-btn {
+  background: transparent;
+  border: 1px solid var(--gold);
+  color: var(--gold);
+  font-family: 'Montserrat', sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 10px 16px;
+  border-radius: 2px;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+.activate-btn:hover { background: var(--gold); color: var(--bg-deep); }
+.activate-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+.section-heading {
+  width: 100%;
+  max-width: 640px;
+  font-family: 'Cinzel', serif;
+  font-size: 13px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--grey);
+  margin: 8px 0 14px;
+}
+
+.add-habit-btn {
+  background: none;
+  border: 1px solid rgba(246,246,246,0.14);
+  color: var(--white);
+  font-family: 'Montserrat', sans-serif;
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  padding: 14px 18px;
+  border-radius: 2px;
+  cursor: pointer;
+  width: 100%;
+  max-width: 640px;
+  transition: border-color 0.2s;
+}
+.add-habit-btn:hover { border-color: var(--gold); }
+
+/* Détail d'une habitude */
+.habit-stats {
+  width: 100%;
+  max-width: 460px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+  margin-bottom: 40px;
+}
+.stat-tile {
+  background: var(--bg-card);
+  border: 1px solid rgba(246,246,246,0.1);
+  border-radius: 2px;
+  padding: 18px;
+  text-align: center;
+}
+.stat-tile .value { font-family: 'Cinzel', serif; font-size: 24px; color: var(--gold); }
+.stat-tile .label { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--grey); margin-top: 6px; }
+
+.heatmap {
+  width: 100%;
+  max-width: 460px;
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+  margin-bottom: 12px;
+}
+.heatmap .cell {
+  aspect-ratio: 1;
+  border-radius: 2px;
+  background: rgba(246,246,246,0.06);
+}
+.heatmap .cell.done { background: var(--gold); }
+.heatmap .cell.future { background: transparent; }

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Créer mon compte — IT BOY</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../assets/css/style.css" />
+</head>
+<body>
+
+<div class="page-shell">
+  <a href="../" class="logo-mark" style="font-size:22px">
+    <span class="i">I</span><span class="b">B</span>
+  </a>
+  <h1 class="page-title font-cinzel">Créer mon compte</h1>
+  <p class="page-subtitle">Pour sauvegarder ton plan et suivre tes habitudes.</p>
+
+  <div id="banner-zone" style="width:100%;max-width:380px"></div>
+
+  <form class="form" id="signup-form">
+    <label class="form-label">Email
+      <input class="form-input" type="email" name="email" required autocomplete="email" />
+    </label>
+    <label class="form-label">Mot de passe
+      <input class="form-input" type="password" name="password" required minlength="6" autocomplete="new-password" />
+    </label>
+    <button class="cta-btn" type="submit" id="submit-btn" style="margin-top:8px">Créer mon compte</button>
+  </form>
+
+  <p class="form-note">Déjà un compte ? <a href="../login/">Se connecter</a></p>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../assets/js/lib/config.js"></script>
+<script src="../assets/js/lib/supabaseClient.js"></script>
+<script src="../assets/js/lib/ui.js"></script>
+<script src="../assets/js/lib/auth.js"></script>
+<script src="../assets/js/lib/api.js"></script>
+<script src="../assets/js/lib/storage.js"></script>
+<script src="../assets/js/signup.js"></script>
+</body>
+</html>
