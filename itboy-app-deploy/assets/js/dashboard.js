@@ -1,8 +1,8 @@
-/* IT BOY — Écran /dashboard (tracker principal)
-   La limite de plan affichée/désactivée ici est un confort d'UI : la
-   vérité est appliquée en base par le trigger `enforce_habit_limit`
-   (voir supabase/schema.sql) — un rejet serveur est toujours possible
-   et affiché tel quel (course entre deux onglets, etc.). */
+/* IT BOY - Ecran /dashboard (tracker principal)
+   La limite de plan affichee/desactivee ici est un confort d'UI : la
+   verite est appliquee en base par le trigger `enforce_habit_limit`
+   (voir supabase/schema.sql) - un rejet serveur est toujours possible
+   et affiche tel quel (course entre deux onglets, etc.). */
 
 (function () {
   var bannerZone = document.getElementById('banner-zone');
@@ -25,7 +25,7 @@
   }
 
   function renderLimitNote() {
-    limitNoteEl.textContent = habits.length + '/' + planLimit() + ' habitudes actives — plan ' +
+    limitNoteEl.textContent = habits.length + '/' + planLimit() + ' habitudes actives - plan ' +
       (profile.plan === 'premium' ? 'Premium' : 'Free') + '.';
   }
 
@@ -106,7 +106,7 @@
         '<span class="category">' + (window.ITBOY.CATEGORY_LABELS[h.category] || h.category) + '</span>' +
         '</div>' +
         '<div class="streak-indicator"><span class="dot"></span>' + streak + '</div>' +
-        '<a class="detail-link" href="../habits/?id=' + h.id + '">Détail</a>' +
+        '<a class="detail-link" href="../habits/?id=' + h.id + '">Detail</a>' +
         '<button class="archive-btn" data-action="archive">Archiver</button>' +
         '</div>';
     }).join('');
@@ -205,6 +205,12 @@
 
     try {
       profile = await window.ITBOY.api.getProfile(user.id);
+
+      if (!profile.onboarded) {
+        window.location.href = '../plans/';
+        return;
+      }
+
       habits = await window.ITBOY.api.getHabits(user.id, { archived: false });
 
       var allLogs = await window.ITBOY.api.getLogsForUser(user.id);
