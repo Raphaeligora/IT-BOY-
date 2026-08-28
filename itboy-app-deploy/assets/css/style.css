@@ -1,3 +1,46 @@
+
+
+/* Progression du jour (dashboard) */
+.today-progress {
+  width: 100%;
+  max-width: 640px;
+  margin: -8px 0 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.today-progress-track {
+  flex: 1;
+  height: 4px;
+  background: rgba(246,246,246,0.1);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.today-progress-fill {
+  height: 100%;
+  background: var(--gold);
+  transition: width 0.3s ease;
+}
+.today-progress-label {
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: var(--grey);
+  white-space: nowrap;
+}
+
+/* Mini historique 7 jours par habitude (dashboard) */
+.mini-week {
+  display: flex;
+  gap: 4px;
+  margin-top: 6px;
+}
+.mini-week .d {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: rgba(246,246,246,0.12);
+}
+.mini-week .d.done { background: var(--gold); }
 /* IT BOY — feuille de style partagée (landing + quiz)
    Charte : voir design-guidelines.md à la racine du repo. */
 
