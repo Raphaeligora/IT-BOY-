@@ -1,0 +1,10 @@
+{
+  "name": "itboy-app-deploy",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Fonctions serverless IT BOY (paiement Stripe Premium).",
+  "dependencies": {
+    "stripe": "^17.4.0",
+    "@supabase/supabase-js": "^2.47.10"
+  }
+}
