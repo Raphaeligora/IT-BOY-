@@ -15,12 +15,20 @@
   <a href="../" class="logo-mark" style="font-size:22px;align-self:center">
     <span class="i">I</span><span class="b">B</span>
   </a>
-  <h1 class="page-title font-cinzel">Paiement à venir</h1>
-  <p class="page-subtitle">
-    L'intégration du paiement Premium n'est pas encore branchée — elle arrive dans une étape séparée.
+  <h1 class="page-title font-cinzel">Passage en Premium</h1>
+  <p class="page-subtitle" id="checkout-status">
+    Redirection vers le paiement securise Stripe...
   </p>
-  <a href="../plans/" class="link-muted">← Retour au choix du plan</a>
+  <div id="banner-zone"></div>
+  <a href="../plans/" class="link-muted">&larr; Retour au choix du plan</a>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../assets/js/lib/config.js"></script>
+<script src="../assets/js/lib/supabaseClient.js"></script>
+<script src="../assets/js/lib/auth.js"></script>
+<script src="../assets/js/lib/ui.js"></script>
+<script src="../assets/js/checkout.js"></script>
 
 </body>
 </html>
