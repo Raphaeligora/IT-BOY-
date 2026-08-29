@@ -222,3 +222,14 @@ create index if not exists habits_user_id_idx on public.habits (user_id);
 alter table public.profiles add column if not exists email text;
 alter table public.profiles add column if not exists onboarded boolean not null default false;
 update public.profiles p set email = u.email from auth.users u where p.id = u.id and p.email is null;
+
+-- ============================================================
+-- 6. Migration Stripe (aout 2026) - colonnes pour relier un profil
+--    a son client/abonnement Stripe. Remplies par
+--    api/stripe-webhook.js une fois le paiement Premium confirme.
+--    Sans effet si les colonnes existent deja (deja appliquee en
+--    production via SQL Editor).
+-- ============================================================
+
+alter table public.profiles add column if not exists stripe_customer_id text;
+alter table public.profiles add column if not exists stripe_subscription_id text;
