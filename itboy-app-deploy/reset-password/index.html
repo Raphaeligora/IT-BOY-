@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Se connecter — IT BOY</title>
+<title>Nouveau mot de passe — IT BOY</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet" />
@@ -15,23 +15,22 @@
   <a href="../" class="logo-mark" style="font-size:22px">
     <span class="i">I</span><span class="b">B</span>
   </a>
-  <h1 class="page-title font-cinzel">Se connecter</h1>
-  <p class="page-subtitle">Retrouve ton plan et tes habitudes.</p>
+  <h1 class="page-title font-cinzel">Nouveau mot de passe</h1>
+  <p class="page-subtitle" id="page-subtitle">Vérification du lien...</p>
 
   <div id="banner-zone" style="width:100%;max-width:380px"></div>
 
-  <form class="form" id="login-form">
-    <label class="form-label">Email
-      <input class="form-input" type="email" name="email" required autocomplete="email" />
+  <form class="form" id="reset-form" style="display:none">
+    <label class="form-label">Nouveau mot de passe
+      <input class="form-input" type="password" name="password" required minlength="6" autocomplete="new-password" />
     </label>
-    <label class="form-label">Mot de passe
-      <input class="form-input" type="password" name="password" required autocomplete="current-password" />
+    <label class="form-label">Confirme-le
+      <input class="form-input" type="password" name="passwordConfirm" required minlength="6" autocomplete="new-password" />
     </label>
-    <button class="cta-btn" type="submit" id="submit-btn" style="margin-top:8px">Se connecter</button>
+    <button class="cta-btn" type="submit" id="submit-btn" style="margin-top:8px">Valider le nouveau mot de passe</button>
   </form>
 
-  <p class="form-note"><a href="../forgot-password/">Mot de passe oublié ?</a></p>
-  <p class="form-note">Pas encore de compte ? <a href="../signup/">Créer un compte</a></p>
+  <p class="form-note"><a href="../login/">&larr; Retour à la connexion</a></p>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -39,7 +38,6 @@
 <script src="../assets/js/lib/supabaseClient.js"></script>
 <script src="../assets/js/lib/ui.js"></script>
 <script src="../assets/js/lib/auth.js"></script>
-<script src="../assets/js/lib/api.js"></script>
-<script src="../assets/js/login.js"></script>
+<script src="../assets/js/resetPassword.js"></script>
 </body>
 </html>

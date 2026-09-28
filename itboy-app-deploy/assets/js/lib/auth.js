@@ -41,12 +41,33 @@
     window.location.href = '../login/';
   }
 
+  // Envoie un email avec un lien de reinitialisation. Le lien renvoie sur
+  // /reset-password/ avec une session de type "recovery" (geree par
+  // Supabase cote client, via le hash de l'URL) qui autorise UNE seule
+  // fois l'appel a updatePassword ci-dessous.
+  async function resetPasswordForEmail(email) {
+    var res = await client().auth.resetPasswordForEmail(email, {
+      redirectTo: window.location.origin + '/reset-password/'
+    });
+    if (res.error) throw res.error;
+  }
+
+  // A appeler uniquement depuis /reset-password/, une fois la session de
+  // recuperation etablie (voir resetPassword.js).
+  async function updatePassword(newPassword) {
+    var res = await client().auth.updateUser({ password: newPassword });
+    if (res.error) throw res.error;
+    return res.data.user;
+  }
+
   global.ITBOY = global.ITBOY || {};
   global.ITBOY.auth = {
     getUser: getUser,
     requireUser: requireUser,
     signUp: signUp,
     signIn: signIn,
-    signOut: signOut
+    signOut: signOut,
+    resetPasswordForEmail: resetPasswordForEmail,
+    updatePassword: updatePassword
   };
 })(window);
