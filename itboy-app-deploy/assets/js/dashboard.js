@@ -6,6 +6,7 @@
 
 (function () {
   var bannerZone = document.getElementById('banner-zone');
+  var overviewEl = document.getElementById('overview-stats');
   var limitNoteEl = document.getElementById('plan-limit-note');
   var todayProgressEl = document.getElementById('today-progress');
   var listEl = document.getElementById('habit-list');
@@ -18,6 +19,10 @@
   var profile = null;
   var habits = [];      // habitudes actives
   var logsByHabit = {};  // habitId -> [completed_date, ...]
+  // Total de coches tous logs confondus (y compris habitudes archivees,
+  // cf. getLogsForUser) - tenu a jour localement sans refetch a chaque
+  // coche/decoche pour le bandeau de vue d'ensemble.
+  var totalCheckins = 0;
 
   // Recalculee a chaque usage (jamais mise en cache) : si l'onglet reste
   // ouvert a cheval sur minuit, un "coché aujourd'hui" doit refleter le
@@ -33,6 +38,23 @@
     limitNoteEl.textContent = isPremium
       ? habits.length + ' habitude' + (habits.length > 1 ? 's' : '') + ' active' + (habits.length > 1 ? 's' : '') + ' - plan Premium (illimité).'
       : habits.length + '/' + planLimit() + ' habitudes actives - plan Free.';
+  }
+
+  // Bandeau de vue d'ensemble : nb d'habitudes actives, total de coches
+  // (tous logs confondus, y compris habitudes archivees), et le meilleur
+  // streak en cours parmi les habitudes actives.
+  function renderOverview() {
+    if (!overviewEl) return;
+    var today = todayStr();
+    var bestStreak = habits.reduce(function (max, h) {
+      var streak = window.ITBOY.streak.computeCurrentStreak(logsByHabit[h.id] || [], today);
+      return Math.max(max, streak);
+    }, 0);
+
+    overviewEl.innerHTML =
+      '<div class="stat-tile"><div class="value">' + habits.length + '</div><div class="label">Habitude' + (habits.length > 1 ? 's' : '') + ' active' + (habits.length > 1 ? 's' : '') + '</div></div>' +
+      '<div class="stat-tile"><div class="value">' + totalCheckins + '</div><div class="label">Coche' + (totalCheckins > 1 ? 's' : '') + ' au total</div></div>' +
+      '<div class="stat-tile"><div class="value">' + bestStreak + '</div><div class="label">Meilleur streak actuel</div></div>';
   }
 
   // 7 derniers jours (dont aujourd'hui), du plus ancien au plus recent -
@@ -115,12 +137,15 @@
       if (doneToday) {
         await window.ITBOY.api.unmarkDoneToday(habitId);
         logsByHabit[habitId] = dates.filter(function (d) { return d !== today; });
+        totalCheckins -= 1;
       } else {
         await window.ITBOY.api.markDoneToday(user.id, habitId);
         logsByHabit[habitId] = dates.concat([today]);
+        totalCheckins += 1;
       }
       renderHabitList();
       renderTodayProgress();
+      renderOverview();
     } catch (err) {
       window.ITBOY.ui.showError(bannerZone, err);
     }
@@ -134,6 +159,7 @@
       renderLimitNote();
       renderHabitList();
       renderTodayProgress();
+      renderOverview();
     } catch (err) {
       window.ITBOY.ui.showError(bannerZone, err);
     }
@@ -175,6 +201,7 @@
       renderLimitNote();
       renderHabitList();
       renderTodayProgress();
+      renderOverview();
       if (wasFirstHabit) window.ITBOY.track('first_habit_created', { category: category });
     } catch (err) {
       window.ITBOY.ui.showError(bannerZone, err);
@@ -211,10 +238,12 @@
         if (!logsByHabit[log.habit_id]) logsByHabit[log.habit_id] = [];
         logsByHabit[log.habit_id].push(log.completed_date);
       });
+      totalCheckins = allLogs.length;
 
       renderLimitNote();
       renderHabitList();
       renderTodayProgress();
+      renderOverview();
     } catch (err) {
       window.ITBOY.ui.showError(bannerZone, err);
     }

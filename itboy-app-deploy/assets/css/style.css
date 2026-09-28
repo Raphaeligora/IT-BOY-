@@ -457,6 +457,22 @@ a { color: var(--gold); text-decoration: none; }
   margin-bottom: 40px;
 }
 
+/* Bandeau vue d'ensemble (dashboard) — reutilise le style .stat-tile
+   du detail d'habitude, en 3 colonnes, largeur dashboard (640px). */
+.overview-stats {
+  width: 100%;
+  max-width: 640px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 24px;
+}
+@media (max-width: 480px) {
+  .overview-stats { grid-template-columns: 1fr; }
+}
+.overview-stats .stat-tile { padding: 16px; }
+.overview-stats .stat-tile .value { font-size: 22px; }
+
 .plan-limit-note {
   width: 100%;
   max-width: 640px;
@@ -631,6 +647,68 @@ a { color: var(--gold); text-decoration: none; }
 }
 .heatmap .cell.done { background: var(--gold); }
 .heatmap .cell.future { background: transparent; }
+
+/* Heatmap annuelle façon GitHub (detail d'habitude) — colonnes = semaines
+   (lun -> dim), defile horizontalement sur petit ecran plutot que de
+   tasser les cellules. */
+.year-heatmap-wrap {
+  width: 100%;
+  max-width: 720px;
+  margin-bottom: 8px;
+}
+.year-heatmap-scroll {
+  overflow-x: auto;
+  padding-bottom: 6px;
+}
+.year-heatmap-months {
+  display: flex;
+  gap: 3px;
+  margin-bottom: 4px;
+  padding-left: 30px;
+  min-width: max-content;
+}
+.year-heatmap-months span {
+  width: 11px;
+  flex: none;
+  font-size: 10px;
+  color: var(--grey);
+  white-space: nowrap;
+}
+.year-heatmap-body {
+  display: flex;
+  gap: 4px;
+  min-width: max-content;
+}
+.year-heatmap-daylabels {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  flex: none;
+  width: 26px;
+}
+.year-heatmap-daylabels span {
+  height: 11px;
+  line-height: 11px;
+  font-size: 9px;
+  color: var(--grey);
+}
+.year-heatmap {
+  display: flex;
+  gap: 3px;
+}
+.year-heatmap .week-col {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.year-heatmap .cell {
+  width: 11px;
+  height: 11px;
+  border-radius: 2px;
+  background: rgba(246,246,246,0.07);
+}
+.year-heatmap .cell.done { background: var(--gold); }
+.year-heatmap .cell.empty { visibility: hidden; }
 
 /* ---- Landing : nav ---- */
 .landing-nav {
