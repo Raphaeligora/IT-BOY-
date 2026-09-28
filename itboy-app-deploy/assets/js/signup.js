@@ -1,8 +1,7 @@
 /* IT BOY — Écran /signup
-   Crée le compte (Supabase Auth), relie la quiz_session en cours au
-   nouvel utilisateur, puis redirige vers /plans. La ligne `profiles`
-   (plan='free') est créée automatiquement en base par un trigger
-   (voir supabase/schema.sql) — pas de logique à dupliquer ici. */
+   Crée le compte (Supabase Auth) puis redirige vers /plans. La ligne
+   `profiles` (plan='free') est créée automatiquement en base par un
+   trigger (voir supabase/schema.sql) — pas de logique à dupliquer ici. */
 
 (function () {
   var bannerZone = document.getElementById('banner-zone');
@@ -28,11 +27,7 @@
       var user = result.user;
 
       if (user && result.session) {
-        var sessionId = window.ITBOY.storage.getSessionId();
-        if (sessionId) {
-          try { await window.ITBOY.api.linkQuizSessionToUser(sessionId, user.id); }
-          catch (linkErr) { console.warn('[itboy] échec du rattachement de la quiz_session :', linkErr); }
-        }
+        window.ITBOY.track('signup', {}, user.id);
         window.location.href = '../plans/';
         return;
       }

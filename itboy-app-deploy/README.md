@@ -1,7 +1,7 @@
-# IT BOY — Landing page, Quiz, Compte, Plans, Tracker, Paiement Premium
+# IT BOY — Landing page, Compte, Plans, Tracker, Paiement Premium
 
-Un seul projet/repo pour tout le parcours : landing -> quiz -> compte -> choix
-du plan -> paiement Premium -> tracker d'habitudes.
+Un seul projet/repo pour tout le parcours : landing -> compte -> choix du
+plan -> paiement Premium -> tracker d'habitudes.
 
 Site statique (HTML/CSS/JS vanilla, sans framework ni build) pour les pages,
 avec Supabase (Postgres + Auth) comme backend, utilise directement depuis le
@@ -14,8 +14,6 @@ faire tourner soi-meme : Vercel s'en charge).
 
 ```
 index.html                    -> landing page ("/")
-quiz/index.html                -> quiz, 5 questions ("/quiz/")
-quiz/resultat/index.html       -> ecran resultat ("/quiz/resultat/")
 signup/index.html              -> creation de compte ("/signup/")
 login/index.html               -> connexion ("/login/")
 plans/index.html               -> choix Free/Premium ("/plans/")
@@ -26,11 +24,13 @@ habits/index.html               -> detail d'une habitude ("/habits/?id=<uuid>",
 
 api/create-checkout-session.js -> fonction serverless : cree la session Stripe Checkout
 api/stripe-webhook.js          -> fonction serverless : recoit les evenements Stripe,
-                                  met a jour profiles.plan dans Supabase
+                                  met a jour profiles.plan dans Supabase et journalise
+                                  l'evenement "premium_activated"
 package.json                   -> dependances des fonctions serverless (stripe, @supabase/supabase-js)
 
 supabase/schema.sql            -> tables + securite (RLS) + limite de plan en base
                                   + colonnes stripe_customer_id / stripe_subscription_id
+                                  + archivage automatique au downgrade + table events
 
 assets/css/style.css           -> design system partage
 assets/js/lib/config.js        -> identifiants Supabase (a remplir, voir plus bas)
@@ -38,14 +38,33 @@ assets/js/lib/supabaseClient.js-> initialise le client Supabase
 assets/js/lib/auth.js          -> signUp / signIn / signOut / requireUser
 assets/js/lib/api.js           -> toutes les requetes DB (profiles, habits, logs...)
 assets/js/lib/streak.js        -> calcul du streak (fonction pure, testee)
-assets/js/lib/mapping.js       -> mapping reponses quiz -> habitudes (fonction pure)
-assets/js/lib/habitCatalog.js  -> catalogue d'habitudes du quiz
 assets/js/lib/plans.js         -> constantes des plans (limites, features)
-assets/js/lib/storage.js       -> localStorage + envoi de la quiz_session
+assets/js/lib/track.js         -> tracking produit best-effort (table events)
 assets/js/lib/ui.js            -> bandeaux d'erreur / config manquante
-assets/js/{signup,login,plans,dashboard,habitDetail,quiz,resultat,checkout}.js
+assets/js/{signup,login,plans,dashboard,habitDetail,checkout}.js
                                 -> logique d'affichage de chaque ecran
 ```
+
+## Les deux plans
+
+| | Free | Premium — 4,99€/mois |
+|---|---|---|
+| Habitudes suivies | 3 maximum | Illimitees |
+| Historique affiche | 30 derniers jours | Historique complet |
+| Statistiques | Streak, meilleur streak, taux 7j/30j | Idem + vue detaillee |
+
+Pas de palier intermediaire, pas de quiz : landing -> inscription -> choix du
+plan -> tracker. Le streak et le taux de completion se calculent **toujours**
+sur l'historique complet des coches, meme en Free - seule la fenetre
+affichee dans le calendrier (`heatmap`) est limitee a 30 jours ; ce n'est
+qu'une limite d'affichage, pas une regle de securite.
+
+**Downgrade Premium -> Free** : aucune habitude n'est jamais supprimee ni
+bloquee. Si l'utilisateur repasse en Free avec plus de 3 habitudes actives,
+un trigger Postgres (`enforce_plan_downgrade`, section 7 de `schema.sql`)
+archive automatiquement les plus recentes pour n'en garder que 3 actives -
+les donnees restent intactes et consultables si l'utilisateur repasse en
+Premium.
 
 ## Mise en route (Supabase)
 
@@ -53,11 +72,12 @@ assets/js/{signup,login,plans,dashboard,habitDetail,quiz,resultat,checkout}.js
    creer toi-meme - je ne peux pas le faire a ta place).
 2. **Executer le schema** : dans le dashboard Supabase -> SQL Editor -> New
    query -> coller tout le contenu de [`supabase/schema.sql`](supabase/schema.sql) -> Run.
-   Ca cree les 4 tables (`profiles`, `quiz_sessions`, `habits`, `habit_logs`),
-   active les policies RLS, et pose le trigger qui applique la limite de
-   plan **en base** (3 habitudes actives en free, 10 en premium) - c'est ce
-   qui empeche un utilisateur de contourner la limite en appelant l'API
-   Supabase directement, comme l'exige le spec.
+   Ca cree les tables (`profiles`, `habits`, `habit_logs`, `events`), active
+   les policies RLS, et pose les triggers qui appliquent **en base** :
+   - la limite de plan (3 habitudes actives en free, illimite en premium) -
+     ce qui empeche un utilisateur de la contourner en appelant l'API
+     Supabase directement ;
+   - l'archivage automatique au downgrade Premium -> Free decrit ci-dessus.
 3. **Recuperer les identifiants** : Project Settings -> API -> copier
    `Project URL` et la cle `anon public`.
 4. **Les coller dans** [`assets/js/lib/config.js`](assets/js/lib/config.js) :
@@ -72,8 +92,20 @@ assets/js/{signup,login,plans,dashboard,habitDetail,quiz,resultat,checkout}.js
 
 Tant que `config.js` n'est pas rempli, toutes les pages qui ont besoin de
 Supabase (signup, login, plans, dashboard, habits, checkout) affichent un
-bandeau "Configuration Supabase manquante" au lieu de planter - le reste du
-site (landing, quiz) fonctionne sans backend.
+bandeau "Configuration Supabase manquante" au lieu de planter - la landing
+page fonctionne sans backend (le tracking des clics CTA s'y desactive
+simplement, sans erreur).
+
+## Tracking produit (table `events`)
+
+Une table `events` (voir section 7b de `schema.sql`) recoit des evenements
+simples ecrits directement depuis le front via `assets/js/lib/track.js` :
+`landing_cta_click`, `signup`, `first_habit_created`, `plan_chosen`,
+`checkout_started`, `premium_activated` (celui-ci ecrit cote serveur par le
+webhook Stripe). Chaque appel est best-effort et n'attend jamais de reponse
+avant une navigation - un echec (offline, RLS, config absente) ne casse
+jamais le parcours utilisateur. Un `anon_id` persistant en localStorage
+relie les evenements d'un meme visiteur avant qu'il ait un compte.
 
 ## Paiement Premium (Stripe)
 
@@ -84,9 +116,10 @@ Vercel gerent le paiement - le front n'a jamais acces a une cle secrete.
 -> `/checkout/` appelle `api/create-checkout-session.js` (avec son jeton de
 session Supabase) -> redirection vers la page de paiement Stripe -> une fois
 paye, Stripe appelle `api/stripe-webhook.js` qui passe `profiles.plan` a
-`'premium'` dans Supabase. Le dashboard applique alors automatiquement la
-limite de 10 habitudes (deja gere par `PLAN_LIMITS` cote front et par le
-trigger `enforce_habit_limit` cote base - rien a modifier la).
+`'premium'` dans Supabase et journalise l'evenement `premium_activated`. Le
+dashboard applique alors automatiquement la limite illimitee (deja gere par
+`PLAN_LIMITS` cote front et par le trigger `enforce_habit_limit` cote base -
+rien a modifier la).
 
 **Variables d'environnement a ajouter dans Vercel** (Project -> Settings ->
 Environment Variables) - a saisir toi-meme, ce sont des secrets :
@@ -108,7 +141,8 @@ le `STRIPE_WEBHOOK_SECRET` definitif si ce n'est pas deja fait.
 **Test de bout en bout** (mode test Stripe, aucune carte reelle) : sur
 `/checkout/`, utiliser la carte `4242 4242 4242 4242`, une date future et
 n'importe quel CVC. Verifier ensuite que `profiles.plan` est passe a
-`'premium'` pour ce compte et que le dashboard autorise bien 10 habitudes.
+`'premium'` pour ce compte et que le dashboard autorise bien un nombre
+illimite d'habitudes.
 
 ## Previsualiser en local
 
@@ -124,25 +158,35 @@ ne tournent pas avec ce serveur statique local.)
 
 ## Ce qui n'est pas encore branche
 
-- **Ecran "habitudes archivees"** : le spec ne demande qu'un bouton
-  archiver, pas d'ecran pour les consulter/reactiver - pas construit ici.
+- **Ecran "habitudes archivees"** : ni pour l'archivage manuel (bouton
+  archiver) ni pour l'archivage automatique au downgrade - pas d'ecran pour
+  les consulter/reactiver, construit ici.
+- **Connexion Google (OAuth)** : necessite de configurer un client OAuth
+  Google Cloud et d'activer le provider correspondant dans le dashboard
+  Supabase - a faire manuellement, aucune cle disponible ici.
+- **Rappels quotidiens (push/email)** : necessite de choisir et provisionner
+  un service tiers (cles VAPID pour le push, un fournisseur email type
+  Resend/Postmark) - pas construit ici faute d'identifiants.
+- **Statistiques Premium avancees** (repartition mensuelle, correlations
+  entre habitudes) : seules les statistiques de base (streak, meilleur
+  streak, taux 7j/30j, fenetre d'historique 30j/complet) sont branchees.
 
 ## Ce qui a ete teste sans backend reel
 
-- `assets/js/lib/mapping.js` : les 144 combinaisons de reponses possibles
-  ont ete passees en revue (aucun resultat < 3 ou > 6 habitudes, aucun
-  doublon).
 - `assets/js/lib/streak.js` : streak courant (avec/sans trou, coche ou non
   aujourd'hui), meilleur streak historique, et taux de completion -
   verifies sur des cas precis dans la console du navigateur.
 - Toutes les pages dependant de Supabase ont ete chargees sans erreur
   JS lorsque la config est absente (bandeau affiche, pas de crash).
+- La landing page charge et fonctionne (CTA, onglets d'apercu produit,
+  FAQ) meme sans configuration Supabase.
 
 Ce qui a ete teste avec le vrai projet Supabase : inscription/connexion,
-redirection vers `/plans` puis `/dashboard`, activation d'habitudes issues
-du quiz, limite de 3 habitudes en Free, cochage/decochage du jour, streak,
-persistance apres deconnexion/reconnexion.
+redirection vers `/plans` puis `/dashboard`, limite de 3 habitudes en Free,
+cochage/decochage du jour, streak, persistance apres deconnexion/reconnexion.
 
 Ce qui n'a **pas** encore ete teste en conditions reelles : le paiement
 Stripe de bout en bout (necessite que les variables d'environnement
-ci-dessus soient ajoutees dans Vercel).
+ci-dessus soient ajoutees dans Vercel), et le trigger d'archivage automatique
+au downgrade (necessite d'executer la section 7 mise a jour de
+`supabase/schema.sql` sur le projet Supabase reel).

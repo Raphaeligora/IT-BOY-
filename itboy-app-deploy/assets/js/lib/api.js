@@ -25,30 +25,6 @@
           if (res.error) throw res.error;
    }
 
-   async function getQuizSession(sessionId) {
-          if (!sessionId) return null;
-          var res = await db().from('quiz_sessions').select('*').eq('id', sessionId).maybeSingle();
-          if (res.error) throw res.error;
-          return res.data;
-   }
-
-   async function getLatestQuizSessionForUser(userId) {
-          var res = await db().from('quiz_sessions')
-            .select('*')
-            .eq('user_id', userId)
-            .order('created_at', { ascending: false })
-            .limit(1)
-            .maybeSingle();
-          if (res.error) throw res.error;
-          return res.data;
-   }
-
-   async function linkQuizSessionToUser(sessionId, userId) {
-          if (!sessionId) return;
-          var res = await db().from('quiz_sessions').update({ user_id: userId }).eq('id', sessionId);
-          if (res.error) throw res.error;
-   }
-
    async function getHabits(userId, opts) {
           opts = opts || {};
           var query = db().from('habits').select('*').eq('user_id', userId).order('created_at', { ascending: true });
@@ -114,9 +90,6 @@
             todayStr: todayStr,
             getProfile: getProfile,
             markOnboarded: markOnboarded,
-            getQuizSession: getQuizSession,
-            getLatestQuizSessionForUser: getLatestQuizSessionForUser,
-            linkQuizSessionToUser: linkQuizSessionToUser,
             getHabits: getHabits,
             getHabit: getHabit,
             createHabit: createHabit,

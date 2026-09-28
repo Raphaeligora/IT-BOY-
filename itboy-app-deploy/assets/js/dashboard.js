@@ -7,7 +7,6 @@
 (function () {
   var bannerZone = document.getElementById('banner-zone');
   var limitNoteEl = document.getElementById('plan-limit-note');
-  var suggestionsSection = document.getElementById('suggestions-section');
   var todayProgressEl = document.getElementById('today-progress');
   var listEl = document.getElementById('habit-list');
   var addToggleBtn = document.getElementById('add-habit-toggle');
@@ -26,8 +25,10 @@
   }
 
   function renderLimitNote() {
-    limitNoteEl.textContent = habits.length + '/' + planLimit() + ' habitudes actives - plan ' +
-      (profile.plan === 'premium' ? 'Premium' : 'Free') + '.';
+    var isPremium = profile.plan === 'premium';
+    limitNoteEl.textContent = isPremium
+      ? habits.length + ' habitude' + (habits.length > 1 ? 's' : '') + ' active' + (habits.length > 1 ? 's' : '') + ' - plan Premium (illimité).'
+      : habits.length + '/' + planLimit() + ' habitudes actives - plan Free.';
   }
 
   // 7 derniers jours (dont aujourd'hui), du plus ancien au plus recent -
@@ -60,67 +61,6 @@
       '<div class="today-progress-track"><div class="today-progress-fill" style="width:' + pct + '%"></div></div>' +
       '<span class="today-progress-label">' + doneCount + '/' + habits.length + ' faites</span>' +
       '</div>';
-  }
-
-  async function renderSuggestions() {
-    var session;
-    try {
-      session = await window.ITBOY.api.getLatestQuizSessionForUser(user.id);
-    } catch (e) {
-      suggestionsSection.innerHTML = '';
-      return;
-    }
-
-    var suggestedIds = (session && session.suggested_habit_ids) || [];
-    if (!suggestedIds.length) { suggestionsSection.innerHTML = ''; return; }
-
-    var existingNames = {};
-    habits.forEach(function (h) { existingNames[h.name] = true; });
-
-    var pending = suggestedIds
-      .map(function (id) { return window.ITBOY.HABIT_CATALOG.find(function (h) { return h.id === id; }); })
-      .filter(function (h) { return h && !existingNames[h.name]; });
-
-    if (!pending.length) { suggestionsSection.innerHTML = ''; return; }
-
-    var atLimit = habits.length >= planLimit();
-
-    suggestionsSection.innerHTML =
-      '<div class="section-heading">Suggestions de ton quiz</div>' +
-      '<div class="habit-list">' +
-      pending.map(function (h) {
-        return '<div class="suggestion-row">' +
-          '<div class="info">' +
-          '<span class="name">' + window.ITBOY.ui.escapeHtml(h.name) + '</span>' +
-          '<span class="category">' + window.ITBOY.CATEGORY_LABELS[h.category] + '</span>' +
-          '</div>' +
-          '<button class="activate-btn" data-name="' + window.ITBOY.ui.escapeHtml(h.name) + '" ' +
-          'data-category="' + h.category + '"' + (atLimit ? ' disabled' : '') + '>Activer</button>' +
-          '</div>';
-      }).join('') +
-      '</div>' +
-      (atLimit ? '<p class="plan-limit-note">Limite de ' + planLimit() + ' habitudes atteinte pour ton plan.</p>' : '');
-
-    suggestionsSection.querySelectorAll('.activate-btn').forEach(function (btn) {
-      btn.addEventListener('click', function () {
-        activateHabit(btn.getAttribute('data-name'), btn.getAttribute('data-category'), 'quiz');
-      });
-    });
-  }
-
-  async function activateHabit(name, category, source) {
-    bannerZone.innerHTML = '';
-    try {
-      var habit = await window.ITBOY.api.createHabit(user.id, { name: name, category: category, source: source });
-      habits.push(habit);
-      logsByHabit[habit.id] = [];
-      renderLimitNote();
-      renderHabitList();
-      renderTodayProgress();
-      await renderSuggestions();
-    } catch (err) {
-      window.ITBOY.ui.showError(bannerZone, err);
-    }
   }
 
   function renderHabitList() {
@@ -187,7 +127,6 @@
       renderLimitNote();
       renderHabitList();
       renderTodayProgress();
-      await renderSuggestions();
     } catch (err) {
       window.ITBOY.ui.showError(bannerZone, err);
     }
@@ -217,6 +156,7 @@
     if (!name) return;
 
     try {
+      var wasFirstHabit = habits.length === 0;
       var habit = await window.ITBOY.api.createHabit(user.id, {
         name: name, category: category, frequency: frequency,
         frequencyPerWeek: frequencyPerWeek, source: 'custom'
@@ -228,6 +168,7 @@
       renderLimitNote();
       renderHabitList();
       renderTodayProgress();
+      if (wasFirstHabit) window.ITBOY.track('first_habit_created', { category: category });
     } catch (err) {
       window.ITBOY.ui.showError(bannerZone, err);
     }
@@ -267,7 +208,6 @@
       renderLimitNote();
       renderHabitList();
       renderTodayProgress();
-      await renderSuggestions();
     } catch (err) {
       window.ITBOY.ui.showError(bannerZone, err);
     }

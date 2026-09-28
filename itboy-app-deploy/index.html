@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>IT BOY — Change ta vie. Deviens un IT BOY.</title>
-<meta name="description" content="Suis tes habitudes chaque jour, avec un plan pensé pour toi. Devenir sa meilleure version." />
+<meta name="description" content="Suis tes habitudes chaque jour, avec un tracker pensé pour ceux qui veulent progresser. Devenir sa meilleure version." />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet" />
@@ -12,36 +12,212 @@
 </head>
 <body>
 
-<section style="position:relative;padding:28px 22px 96px;display:flex;flex-direction:column;align-items:center;background:radial-gradient(120% 70% at 50% 8%, #14243C 0%, #0A1322 62%)">
-  <svg viewBox="0 0 400 400" aria-hidden="true" style="position:absolute;top:150px;left:50%;transform:translateX(-50%);width:min(560px,120vw);opacity:0.16;pointer-events:none">
-    <circle cx="200" cy="200" r="196" fill="none" stroke="#CDA34E" stroke-width="1" stroke-dasharray="1000 190" stroke-linecap="round" transform="rotate(-58 200 200)" />
-    <circle cx="200" cy="200" r="150" fill="none" stroke="#CDA34E" stroke-width="0.6" stroke-dasharray="700 240" stroke-linecap="round" transform="rotate(112 200 200)" />
-  </svg>
+<!-- ============ NAV + HERO ============ -->
+<section style="position:relative;padding:22px 22px 96px;display:flex;flex-direction:column;align-items:center">
 
-  <a href="login/" class="link-muted" style="position:absolute;top:24px;right:22px;font-size:12px;letter-spacing:0.08em;z-index:1">Se connecter</a>
+  <nav class="landing-nav" style="padding:6px 0 0">
+    <div class="landing-nav-brand">
+      <div class="logo-mark" style="font-size:20px">
+        <span class="i">I</span><span class="b" style="margin-left:-3px">B</span>
+      </div>
+      <div class="logo-word" style="font-size:9px;letter-spacing:0.32em">IT BOY</div>
+    </div>
+    <div class="landing-nav-links">
+      <a href="#fonctionnalites" class="link-muted">Fonctionnalités</a>
+      <a href="#faq" class="link-muted">FAQ</a>
+      <a href="login/" class="cta-btn ghost nav-cta">Se connecter</a>
+      <a href="signup/" class="cta-btn nav-cta" id="nav-signup-cta">Commencer</a>
+    </div>
+  </nav>
 
-  <div style="position:relative;display:flex;flex-direction:column;align-items:center;gap:10px">
-    <div class="logo-mark" style="font-size:34px">
-      <span class="i">I</span><span class="b">B</span>
-    </div>
-    <div style="display:flex;flex-direction:column;align-items:center;gap:6px">
-      <div class="logo-word" style="font-size:12px;letter-spacing:0.42em">IT BOY</div>
-      <div style="width:52px;height:1px;background:#CDA34E"></div>
-    </div>
+  <div class="eyebrow-badge" style="position:relative;margin-top:64px">
+    <svg class="sparkle" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 1 L13.6 10.4 L23 12 L13.6 13.6 L12 23 L10.4 13.6 L1 12 L10.4 10.4 Z" fill="#CDA34E" /></svg>
+    Free &amp; Premium dès 4,99€/mois
   </div>
 
-  <h1 class="font-cinzel" style="position:relative;font-weight:600;font-size:clamp(34px,10vw,64px);line-height:1.12;letter-spacing:0.01em;text-align:center;margin:76px 0 0;max-width:16ch;text-wrap:balance">Change ta vie.<br />Deviens un IT BOY.</h1>
+  <h1 class="font-cinzel" style="position:relative;font-weight:600;font-size:clamp(34px,10vw,64px);line-height:1.12;letter-spacing:0.01em;text-align:center;margin:26px 0 0;max-width:16ch;text-wrap:balance">Change ta vie.<br />Deviens un IT BOY.</h1>
 
-  <p style="position:relative;font-size:16px;line-height:1.65;color:#8A8A8A;text-align:center;margin:22px 0 0;max-width:34ch;text-wrap:pretty">Suis tes habitudes chaque jour, avec un plan pensé pour toi. La progression se mesure, elle ne s'espère pas.</p>
+  <p style="position:relative;font-size:16px;line-height:1.65;color:#8A8A8A;text-align:center;margin:22px 0 0;max-width:38ch;text-wrap:pretty">Un calendrier visuel pour chaque habitude qui compte. Suivi quotidien, séries, statistiques — sur tous tes appareils.</p>
 
-  <a href="quiz/" class="cta-btn" style="position:relative;margin-top:40px">Commencer</a>
+  <a href="signup/" class="cta-btn hero-signup-cta" style="position:relative;margin-top:40px">Commencer</a>
 
-  <p style="position:relative;margin-top:18px;font-size:13px;color:#8A8A8A">Déjà un compte ? <a href="login/" class="link-muted" style="color:#CDA34E">Se connecter</a></p>
-
-  <div style="position:relative;margin-top:22px;font-size:12px;letter-spacing:0.14em;text-transform:uppercase;color:#8A8A8A">Devenir sa meilleure version</div>
+  <p style="position:relative;margin-top:18px;font-size:12px;letter-spacing:0.04em;color:#8A8A8A">Devenir sa meilleure version · <a href="#fonctionnalites" class="link-muted" style="color:#CDA34E">voir les fonctionnalités</a></p>
 </section>
 
-<section style="padding:0 22px 96px;display:flex;flex-direction:column;align-items:center">
+<!-- ============ APERÇU PRODUIT (onglets) ============ -->
+<section style="padding:88px 22px 0;display:flex;flex-direction:column;align-items:center">
+
+  <div class="tab-bar" role="tablist">
+    <button class="tab-btn active" data-tab="today" role="tab" aria-selected="true">Aujourd'hui</button>
+    <button class="tab-btn" data-tab="calendar" role="tab" aria-selected="false">Calendrier</button>
+    <button class="tab-btn" data-tab="stats" role="tab" aria-selected="false">Statistiques</button>
+  </div>
+
+  <div style="width:100%;max-width:420px">
+
+    <div class="tab-panel active" data-panel="today">
+      <div class="mockup-card">
+        <div class="mockup-card-head">
+          <span class="title">AUJOURD'HUI</span>
+          <span class="frac">3/4 faites</span>
+        </div>
+        <div class="mockup-track"><div class="fill"></div></div>
+
+        <div class="mockup-row">
+          <div class="mockup-dot done"></div>
+          <div class="info">
+            <span class="name">Lecture — 20 min</span>
+            <div class="mini-week"><span class="done"></span><span class="done"></span><span class="done"></span><span class="done"></span><span class="done"></span><span class="done"></span><span class="done"></span></div>
+          </div>
+          <div class="streak">12</div>
+        </div>
+        <div class="mockup-row">
+          <div class="mockup-dot done"></div>
+          <div class="info">
+            <span class="name">Sport</span>
+            <div class="mini-week"><span></span><span class="done"></span><span class="done"></span><span></span><span class="done"></span><span class="done"></span><span class="done"></span></div>
+          </div>
+          <div class="streak">5</div>
+        </div>
+        <div class="mockup-row">
+          <div class="mockup-dot"></div>
+          <div class="info">
+            <span class="name">Méditation</span>
+            <div class="mini-week"><span class="done"></span><span class="done"></span><span class="done"></span><span class="done"></span><span class="done"></span><span class="done"></span><span></span></div>
+          </div>
+          <div class="streak">21</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-panel" data-panel="calendar">
+      <div class="mockup-card">
+        <div class="mockup-card-head">
+          <span class="title">LECTURE — SEPTEMBRE</span>
+          <span class="frac">24/30</span>
+        </div>
+        <div class="heatmap" style="max-width:none">
+          <div class="cell done"></div><div class="cell done"></div><div class="cell"></div><div class="cell done"></div><div class="cell done"></div><div class="cell done"></div><div class="cell"></div>
+          <div class="cell done"></div><div class="cell done"></div><div class="cell done"></div><div class="cell"></div><div class="cell done"></div><div class="cell done"></div><div class="cell done"></div>
+          <div class="cell done"></div><div class="cell"></div><div class="cell done"></div><div class="cell done"></div><div class="cell done"></div><div class="cell done"></div><div class="cell"></div>
+          <div class="cell done"></div><div class="cell done"></div><div class="cell done"></div><div class="cell done"></div><div class="cell"></div><div class="cell done"></div><div class="cell done"></div>
+          <div class="cell done"></div><div class="cell done"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-panel" data-panel="stats">
+      <div class="mockup-card">
+        <div class="habit-stats" style="max-width:none;margin-bottom:0">
+          <div class="stat-tile"><div class="value">28</div><div class="label">Streak actuel</div></div>
+          <div class="stat-tile"><div class="value">41</div><div class="label">Meilleur streak</div></div>
+          <div class="stat-tile"><div class="value">92%</div><div class="label">Sur 7 jours</div></div>
+          <div class="stat-tile"><div class="value">86%</div><div class="label">Sur 30 jours</div></div>
+        </div>
+      </div>
+      <div class="mockup-stats-note">Statistiques détaillées — Premium</div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ============ BANDEAU CATÉGORIES ============ -->
+<section style="padding:88px 0 0">
+  <div class="chip-marquee">
+    <div class="chip-track">
+      <span class="chip">Lecture</span><span class="chip">Sport</span><span class="chip">Méditation</span><span class="chip">Hydratation</span><span class="chip">Sommeil</span><span class="chip">Planification</span><span class="chip">Gratitude</span><span class="chip">Zéro réseaux sociaux</span><span class="chip">Épargne</span><span class="chip">Budget</span><span class="chip">Nutrition</span><span class="chip">Étirements</span><span class="chip">Bilan hebdo</span><span class="chip">Lever tôt</span><span class="chip">Zone de confort</span><span class="chip">Achat réfléchi</span>
+      <span class="chip">Lecture</span><span class="chip">Sport</span><span class="chip">Méditation</span><span class="chip">Hydratation</span><span class="chip">Sommeil</span><span class="chip">Planification</span><span class="chip">Gratitude</span><span class="chip">Zéro réseaux sociaux</span><span class="chip">Épargne</span><span class="chip">Budget</span><span class="chip">Nutrition</span><span class="chip">Étirements</span><span class="chip">Bilan hebdo</span><span class="chip">Lever tôt</span><span class="chip">Zone de confort</span><span class="chip">Achat réfléchi</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SOUND FAMILIAR ============ -->
+<section style="padding:112px 22px 0;display:flex;flex-direction:column;align-items:center">
+  <h2 class="font-cinzel" style="font-weight:500;font-size:clamp(24px,6.5vw,34px);line-height:1.3;text-align:center;margin:0 0 48px;max-width:18ch">Ça te parle ?</h2>
+  <div class="why-grid">
+    <div class="why-row">
+      <div class="num">01</div>
+      <div><p class="title" style="font-family:'Cinzel',serif">Un jour manqué — la série est cassée, la motivation avec.</p></div>
+    </div>
+    <div class="why-row">
+      <div class="num">02</div>
+      <div><p class="title" style="font-family:'Cinzel',serif">Tu ne sais jamais si tu progresses vraiment, ou si tu tournes en rond.</p></div>
+    </div>
+    <div class="why-row">
+      <div class="num">03</div>
+      <div><p class="title" style="font-family:'Cinzel',serif">Des apps chargées de fonctions inutiles, pour un prix élevé.</p></div>
+    </div>
+    <div class="why-row">
+      <div class="num">04</div>
+      <div><p class="title" style="font-family:'Cinzel',serif">Tu notes tes objectifs dans un carnet, puis tu oublies de les relire.</p></div>
+    </div>
+  </div>
+  <p style="margin-top:36px;font-size:15px;color:#8A8A8A;text-align:center;max-width:36ch">Il te faut un seul endroit, pensé pour durer.</p>
+</section>
+
+<!-- ============ FONCTIONNALITÉS ============ -->
+<section id="fonctionnalites" style="padding:112px 22px 0;display:flex;flex-direction:column;align-items:center">
+  <div style="width:100%;max-width:1040px;text-align:center;margin-bottom:48px">
+    <h2 class="font-cinzel" style="font-weight:500;font-size:clamp(24px,6.5vw,34px);line-height:1.3;margin:0 0 14px">Tout ce qu'il faut pour progresser</h2>
+    <p style="font-size:15px;color:#8A8A8A;margin:0">Une app puissante, à l'interface simple. Habitudes, séries, statistiques.</p>
+  </div>
+
+  <div class="feature-grid">
+    <div class="feature-card">
+      <div class="mark"></div>
+      <div class="title">Free &amp; Premium</div>
+      <div class="desc">Commence gratuitement, passe à l'échelle quand tu es prêt. Aucune fonctionnalité cachée.</div>
+    </div>
+    <div class="feature-card">
+      <div class="mark"></div>
+      <div class="title">Statistiques détaillées</div>
+      <div class="desc">Taux de complétion, tendances, meilleurs jours.</div>
+      <span class="badge">Premium</span>
+    </div>
+    <div class="feature-card">
+      <div class="mark"></div>
+      <div class="title">Habitudes illimitées</div>
+      <div class="desc">Suis autant d'habitudes que tu veux, sans plafond.</div>
+      <span class="badge">Premium</span>
+    </div>
+    <div class="feature-card">
+      <div class="mark"></div>
+      <div class="title">Séries</div>
+      <div class="desc">Suis tes jours consécutifs. Reste motivé à ne pas rompre la chaîne.</div>
+    </div>
+    <div class="feature-card">
+      <div class="mark"></div>
+      <div class="title">Historique visuel</div>
+      <div class="desc">Un calendrier qui montre ta régularité en un coup d'œil.</div>
+    </div>
+    <div class="feature-card">
+      <div class="mark"></div>
+      <div class="title">Multi-appareils</div>
+      <div class="desc">Installable comme une app, synchronisé partout.</div>
+    </div>
+    <div class="feature-card">
+      <div class="mark"></div>
+      <div class="title">Prix clair</div>
+      <div class="desc">0€ pour commencer, 4,99€/mois pour aller plus loin. Rien de caché.</div>
+    </div>
+    <div class="feature-card">
+      <div class="mark"></div>
+      <div class="title">Inscription en 30 secondes</div>
+      <div class="desc">Email, et tu es dans l'app. Pas d'étapes inutiles.</div>
+    </div>
+    <div class="feature-card">
+      <div class="mark"></div>
+      <div class="title">Un geste suffit</div>
+      <div class="desc">Coche fait depuis le tableau de bord, en un tap.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ COMMENT ÇA MARCHE ============ -->
+<section style="padding:112px 22px 0;display:flex;flex-direction:column;align-items:center">
+  <h2 class="font-cinzel" style="font-weight:500;font-size:clamp(24px,6.5vw,34px);line-height:1.3;text-align:center;margin:0 0 8px;max-width:20ch">Comment ça marche</h2>
+  <p style="font-size:15px;color:#8A8A8A;margin:0 0 8px">Commence à progresser en 3 étapes simples</p>
+
   <div style="width:100%;max-width:560px;display:flex;flex-direction:column;gap:0">
 
     <div style="display:flex;flex-direction:column;gap:14px;padding:38px 0">
@@ -49,8 +225,8 @@
         <div style="width:34px;height:1px;background:#CDA34E"></div>
         <span class="font-cinzel" style="font-size:13px;letter-spacing:0.3em;color:#CDA34E">01</span>
       </div>
-      <h3 class="font-cinzel" style="font-weight:500;font-size:22px;line-height:1.25;letter-spacing:0.03em;margin:0">Réponds à quelques questions</h3>
-      <p style="font-size:15px;line-height:1.6;color:#8A8A8A;margin:0;max-width:40ch">Pour qu'on comprenne où tu en es, et où tu veux aller.</p>
+      <h3 class="font-cinzel" style="font-weight:500;font-size:22px;line-height:1.25;letter-spacing:0.03em;margin:0">Crée ton compte</h3>
+      <p style="font-size:15px;line-height:1.6;color:#8A8A8A;margin:0;max-width:40ch">Email, et tu es dans l'app. Aucune carte requise pour commencer.</p>
     </div>
 
     <div style="height:1px;background:linear-gradient(90deg,rgba(205,163,78,0.45),rgba(205,163,78,0))"></div>
@@ -62,8 +238,8 @@
         </svg>
         <span class="font-cinzel" style="font-size:13px;letter-spacing:0.3em;color:#CDA34E">02</span>
       </div>
-      <h3 class="font-cinzel" style="font-weight:500;font-size:22px;line-height:1.25;letter-spacing:0.03em;margin:0">Reçois ton plan</h3>
-      <p style="font-size:15px;line-height:1.6;color:#8A8A8A;margin:0;max-width:40ch">Des habitudes choisies pour ton objectif. Rien de superflu.</p>
+      <h3 class="font-cinzel" style="font-weight:500;font-size:22px;line-height:1.25;letter-spacing:0.03em;margin:0">Ajoute tes habitudes</h3>
+      <p style="font-size:15px;line-height:1.6;color:#8A8A8A;margin:0;max-width:40ch">Jusqu'à trois gratuitement. Plus, en Premium.</p>
     </div>
 
     <div style="height:1px;background:linear-gradient(90deg,rgba(205,163,78,0.45),rgba(205,163,78,0))"></div>
@@ -75,24 +251,100 @@
         </svg>
         <span class="font-cinzel" style="font-size:13px;letter-spacing:0.3em;color:#CDA34E">03</span>
       </div>
-      <h3 class="font-cinzel" style="font-weight:500;font-size:22px;line-height:1.25;letter-spacing:0.03em;margin:0">Deviens un IT BOY</h3>
-      <p style="font-size:15px;line-height:1.6;color:#8A8A8A;margin:0;max-width:40ch">Suis tes habitudes, jour après jour. C'est là que tout se joue.</p>
+      <h3 class="font-cinzel" style="font-weight:500;font-size:22px;line-height:1.25;letter-spacing:0.03em;margin:0">Regarde ta progression</h3>
+      <p style="font-size:15px;line-height:1.6;color:#8A8A8A;margin:0;max-width:40ch">Séries, historique, statistiques : vois exactement où tu en es.</p>
     </div>
 
   </div>
 </section>
 
-<section style="background:#101C2E;padding:80px 22px;display:flex;flex-direction:column;align-items:center">
+<!-- ============ MANIFESTE ============ -->
+<section style="background:#101C2E;padding:80px 22px;margin-top:112px;display:flex;flex-direction:column;align-items:center">
   <p class="font-cinzel" style="font-weight:500;font-size:clamp(24px,6.5vw,38px);line-height:1.3;letter-spacing:0.02em;text-align:center;margin:0;max-width:22ch;text-wrap:balance">Pas de promesses. Pas d'excuses. Juste des habitudes.</p>
   <div style="width:40px;height:1px;background:#CDA34E;margin:34px 0"></div>
   <p style="font-size:16px;line-height:1.7;color:#8A8A8A;text-align:center;margin:0;max-width:38ch;text-wrap:pretty">L'excellence est un choix quotidien. Ce que tu fais aujourd'hui construit celui que tu seras demain. Chaque jour compte.</p>
 </section>
 
-<section style="padding:104px 22px 96px;display:flex;flex-direction:column;align-items:center;background:radial-gradient(100% 80% at 50% 100%, #14243C 0%, #0A1322 60%)">
-  <h2 class="font-cinzel" style="font-weight:600;font-size:clamp(28px,8vw,48px);line-height:1.18;letter-spacing:0.01em;text-align:center;margin:0;max-width:18ch;text-wrap:balance">Un jour, ou jour 1.<br />À toi de choisir.</h2>
-  <a href="quiz/" class="cta-btn" style="margin-top:40px">Commencer</a>
+<!-- ============ POURQUOI IT BOY ============ -->
+<section style="padding:112px 22px 0;display:flex;flex-direction:column;align-items:center">
+  <h2 class="font-cinzel" style="font-weight:500;font-size:clamp(24px,6.5vw,34px);line-height:1.3;text-align:center;margin:0 0 8px;max-width:22ch">Pourquoi IT BOY</h2>
+  <p style="font-size:15px;color:#8A8A8A;margin:0 0 48px;text-align:center">Pensé pour ceux qui veulent comprendre leur propre progression</p>
+  <div class="why-grid">
+    <div class="why-row">
+      <div class="num">—</div>
+      <div>
+        <p class="title">Une seule app, pensée pour durer</p>
+        <p class="desc">Pas dix outils différents pour dix habitudes. Un seul endroit, clair et net.</p>
+      </div>
+    </div>
+    <div class="why-row">
+      <div class="num">—</div>
+      <div>
+        <p class="title">Tes données t'appartiennent</p>
+        <p class="desc">Rien n'est revendu à des annonceurs. Ta progression, c'est ton affaire.</p>
+      </div>
+    </div>
+    <div class="why-row">
+      <div class="num">—</div>
+      <div>
+        <p class="title">Simple par conception</p>
+        <p class="desc">Aucune fonctionnalité superflue, aucun menu confus.</p>
+      </div>
+    </div>
+    <div class="why-row">
+      <div class="num">—</div>
+      <div>
+        <p class="title">Rapide et fiable</p>
+        <p class="desc">Ça s'ouvre, ça se coche, ça se ferme. Rien de plus à charger.</p>
+      </div>
+    </div>
+  </div>
 </section>
 
+<!-- ============ FAQ ============ -->
+<section id="faq" style="padding:112px 22px 0;display:flex;flex-direction:column;align-items:center">
+  <h2 class="font-cinzel" style="font-weight:500;font-size:clamp(24px,6.5vw,34px);line-height:1.3;text-align:center;margin:0 0 48px">Questions fréquentes</h2>
+
+  <div class="faq-list">
+    <details class="faq-item">
+      <summary>Est-ce vraiment gratuit ? Quelle est la contrepartie ?</summary>
+      <p>Le plan Free est gratuit, sans limite de durée, avec trois habitudes suivies. Aucune contrepartie cachée — si tu veux aller plus loin, Premium est à 4,99€/mois.</p>
+    </details>
+    <details class="faq-item">
+      <summary>Puis-je suivre plus de trois habitudes ?</summary>
+      <p>Oui, en passant Premium : plus aucune limite sur le nombre d'habitudes suivies.</p>
+    </details>
+    <details class="faq-item">
+      <summary>Quelle est la différence entre Free et Premium ?</summary>
+      <p>Free : trois habitudes, historique 30 jours. Premium : habitudes illimitées, historique complet, statistiques détaillées et rappels personnalisés.</p>
+    </details>
+    <details class="faq-item">
+      <summary>Comment vois-je si je progresse vraiment ?</summary>
+      <p>Ton streak actuel, ton meilleur streak et ton taux de complétion sont visibles à tout moment. En Premium, les statistiques détaillées vont plus loin.</p>
+    </details>
+    <details class="faq-item">
+      <summary>Comment l'installer sur mon téléphone ?</summary>
+      <p>IT BOY est une web app. Ouvre le site dans ton navigateur et choisis « Ajouter à l'écran d'accueil ». Elle fonctionne alors comme une app, même hors ligne.</p>
+    </details>
+    <details class="faq-item">
+      <summary>Mes données sont-elles en sécurité ?</summary>
+      <p>Elles sont stockées sur des serveurs sécurisés, jamais revendues ni partagées. Tu peux supprimer ton compte à tout moment.</p>
+    </details>
+    <details class="faq-item">
+      <summary>Est-ce que ça synchronise sur tous mes appareils ?</summary>
+      <p>Oui, automatiquement. Coche sur ton téléphone, retrouve tout sur ton ordinateur.</p>
+    </details>
+  </div>
+</section>
+
+<!-- ============ CTA FINAL ============ -->
+<section style="padding:120px 22px 96px;margin-top:40px;display:flex;flex-direction:column;align-items:center">
+  <h2 class="font-cinzel" style="font-weight:600;font-size:clamp(28px,8vw,48px);line-height:1.18;letter-spacing:0.01em;text-align:center;margin:0;max-width:20ch;text-wrap:balance">Commence à devenir un IT BOY aujourd'hui</h2>
+  <p style="font-size:15px;line-height:1.6;color:#8A8A8A;text-align:center;margin:20px 0 0;max-width:36ch">Commence gratuitement, sans carte bancaire. Inscription en 30 secondes.</p>
+  <a href="signup/" class="cta-btn final-signup-cta" style="margin-top:40px">Commencer</a>
+</section>
+
+<!-- ============ FOOTER ============ -->
 <footer style="border-top:1px solid rgba(246,246,246,0.08);padding:52px 22px 44px;display:flex;flex-direction:column;align-items:center;gap:36px">
   <div style="display:flex;flex-direction:column;align-items:center;gap:8px">
     <div class="logo-mark" style="font-size:22px">
@@ -109,6 +361,9 @@
   </div>
 
   <nav style="display:flex;flex-wrap:wrap;justify-content:center;gap:8px 24px">
+    <a href="login/" class="link-muted">Se connecter</a>
+    <a href="#fonctionnalites" class="link-muted">Fonctionnalités</a>
+    <a href="#faq" class="link-muted">FAQ</a>
     <a href="#" class="link-muted">Mentions légales</a>
     <a href="#" class="link-muted">CGU</a>
     <a href="#" class="link-muted">Confidentialité</a>
@@ -117,5 +372,35 @@
   <div style="font-size:11px;letter-spacing:0.1em;color:#8A8A8A">© 2026 IT BOY</div>
 </footer>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="./assets/js/lib/config.js"></script>
+<script src="./assets/js/lib/supabaseClient.js"></script>
+<script src="./assets/js/lib/track.js"></script>
+<script>
+(function () {
+  // Onglets de l'aperçu produit.
+  var tabs = document.querySelectorAll('.tab-btn');
+  var panels = document.querySelectorAll('.tab-panel');
+  tabs.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      tabs.forEach(function (b) { b.classList.remove('active'); b.setAttribute('aria-selected', 'false'); });
+      panels.forEach(function (p) { p.classList.remove('active'); });
+      btn.classList.add('active');
+      btn.setAttribute('aria-selected', 'true');
+      document.querySelector('.tab-panel[data-panel="' + btn.getAttribute('data-tab') + '"]').classList.add('active');
+    });
+  });
+
+  // Tracking (best-effort, non bloquant) des clics sur les CTA d'inscription —
+  // ne doit jamais retarder la navigation vers signup/.
+  if (window.ITBOY && window.ITBOY.track) {
+    document.querySelectorAll('#nav-signup-cta, .hero-signup-cta, .final-signup-cta').forEach(function (el) {
+      el.addEventListener('click', function () {
+        window.ITBOY.track('landing_cta_click', { cta: el.className });
+      });
+    });
+  }
+})();
+</script>
 </body>
 </html>

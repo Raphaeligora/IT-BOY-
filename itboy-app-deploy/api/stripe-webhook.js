@@ -56,6 +56,7 @@ module.exports = async function handler(req, res) {
             stripe_customer_id: session.customer,
             stripe_subscription_id: session.subscription
           }).eq('id', userId);
+          await supabase.from('events').insert({ user_id: userId, name: 'premium_activated', meta: {} });
         }
         break;
       }

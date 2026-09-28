@@ -143,9 +143,10 @@ create policy "habits_delete_own"
   using (auth.uid() = user_id);
 
 -- Regle metier critique (spec section 5) : nombre d'habitudes actives
--- limite par le plan (3 en free, 10 en premium), verifie EN BASE - un
--- appel direct a l'API REST Supabase ne peut donc pas contourner un
--- bouton desactive cote front.
+-- limite par le plan (3 en free, illimite en premium - decision du
+-- 2026-09-28 : une fois Premium debloque, plus aucun plafond), verifie
+-- EN BASE - un appel direct a l'API REST Supabase ne peut donc pas
+-- contourner un bouton desactive cote front.
 create or replace function public.enforce_habit_limit()
 returns trigger
 language plpgsql
@@ -153,12 +154,15 @@ security definer set search_path = public
 as $$
 declare
   user_plan text;
-  max_habits int;
   active_count int;
 begin
   if new.archived = false then
     select plan into user_plan from public.profiles where id = new.user_id;
-    max_habits := case when user_plan = 'premium' then 10 else 3 end;
+
+    -- Premium : pas de plafond, on ne compte meme pas les lignes existantes.
+    if coalesce(user_plan, 'free') = 'premium' then
+      return new;
+    end if;
 
     select count(*) into active_count
     from public.habits
@@ -166,8 +170,8 @@ begin
       and archived = false
       and id <> coalesce(new.id, '00000000-0000-0000-0000-000000000000'::uuid);
 
-    if active_count >= max_habits then
-      raise exception 'Limite de % habitudes atteinte pour ton plan (%)', max_habits, coalesce(user_plan, 'free')
+    if active_count >= 3 then
+      raise exception 'Limite de 3 habitudes atteinte pour ton plan (free)'
         using errcode = 'P0001';
     end if;
   end if;
@@ -233,3 +237,63 @@ update public.profiles p set email = u.email from auth.users u where p.id = u.id
 
 alter table public.profiles add column if not exists stripe_customer_id text;
 alter table public.profiles add column if not exists stripe_subscription_id text;
+
+-- ============================================================
+-- 7. Migration refonte (2026-09-28) - archivage auto au retour
+--    Premium -> Free, et table d'evenements pour le backtest.
+--    Sans effet si deja appliquee.
+-- ============================================================
+
+-- 7a. Retour Premium -> Free : on ARCHIVE (jamais on ne supprime) les
+--     habitudes au-dela des 3 autorisees en free, en gardant les 3
+--     plus anciennes (les plus etablies = les moins disruptives a
+--     perdre). L'utilisateur retrouve tout son historique s'il
+--     repasse Premium plus tard (rien n'est jamais efface).
+create or replace function public.enforce_plan_downgrade()
+returns trigger
+language plpgsql
+security definer set search_path = public
+as $$
+begin
+  if new.plan = 'free' and old.plan = 'premium' then
+    update public.habits
+    set archived = true
+    where user_id = new.id
+      and archived = false
+      and id not in (
+        select id from public.habits
+        where user_id = new.id and archived = false
+        order by created_at asc
+        limit 3
+      );
+  end if;
+  return new;
+end;
+$$;
+
+drop trigger if exists on_profile_plan_downgrade on public.profiles;
+create trigger on_profile_plan_downgrade
+  after update of plan on public.profiles
+  for each row execute procedure public.enforce_plan_downgrade();
+
+-- 7b. Evenements produit (funnel), pour mesurer ce qui marche sans
+--     dependre d'un outil tiers. Ecriture seule depuis le client (anon
+--     ou authentifie) ; lecture reservee au service role (dashboard
+--     Supabase / requetes SQL directes), jamais exposee au front.
+create table if not exists public.events (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid references auth.users (id) on delete set null,
+  anon_id text,
+  name text not null,
+  meta jsonb not null default '{}'::jsonb,
+  created_at timestamptz not null default now()
+);
+
+alter table public.events enable row level security;
+
+create policy "events_insert_anyone"
+  on public.events for insert
+  with check (true);
+
+create index if not exists events_name_idx on public.events (name);
+create index if not exists events_user_id_idx on public.events (user_id);

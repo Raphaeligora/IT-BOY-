@@ -1,10 +1,15 @@
-/* IT BOY — Constantes des plans (contenu exact de prompt-compte-tracker-itboy.md, section 2).
-   La vraie limite est appliquée en base (voir supabase/schema.sql,
-   fonction enforce_habit_limit) — ces constantes ne servent qu'à
-   l'affichage côté front (désactiver un bouton, afficher un message). */
+/* IT BOY — Constantes des plans (mise à jour 2026-09-28 : Premium passe
+   à illimité, plus de plafond à 10). La vraie limite est appliquée en
+   base (voir supabase/schema.sql, fonction enforce_habit_limit) — ces
+   constantes ne servent qu'à l'affichage côté front (désactiver un
+   bouton, afficher un message). Free reste borné à 30 jours
+   d'historique affiché (voir habitDetail.js) — un plafond d'affichage,
+   pas une limite de sécurité, donc pas répliqué ici. */
 
 (function (global) {
-  var PLAN_LIMITS = { free: 3, premium: 10 };
+  // Pas de vraie infinité en JS pour un affichage/comparaison simple :
+  // un plafond volontairement absurde qu'aucun humain n'atteindra.
+  var PLAN_LIMITS = { free: 3, premium: 999999 };
 
   var PLANS = [
     {
@@ -12,15 +17,15 @@
       name: 'Free',
       price: '0€/mois',
       limit: 3,
-      features: ['3 habitudes suivies', 'Historique jour par jour'],
+      features: ['3 habitudes suivies', 'Historique 30 jours'],
       cta: 'Continuer avec Free'
     },
     {
       id: 'premium',
       name: 'Premium',
-      price: '4.99€/mois',
-      limit: 10,
-      features: ['10 habitudes suivies', 'Accès aux données complètes'],
+      price: '4,99€/mois',
+      limit: PLAN_LIMITS.premium,
+      features: ['Habitudes illimitées', 'Historique complet', 'Statistiques détaillées'],
       cta: 'Choisir Premium',
       highlighted: true
     }

@@ -17,13 +17,16 @@
     return '<div class="stat-tile"><div class="value">' + value + '</div><div class="label">' + label + '</div></div>';
   }
 
-  function renderHeatmap(dates) {
+  // Free : 30 derniers jours affichés (limite d'affichage, pas de sécurité
+  // — voir plans.js). Premium : historique complet, borné à la première
+  // habitude créée si elle est plus jeune que ~1 an.
+  function renderHeatmap(dates, days) {
     var done = {};
     dates.forEach(function (d) { done[d] = true; });
 
     var today = new Date();
     var cells = [];
-    for (var i = 29; i >= 0; i--) {
+    for (var i = days - 1; i >= 0; i--) {
       var d = new Date(today);
       d.setDate(d.getDate() - i);
       var str = window.ITBOY.streak._dateStr(d);
@@ -48,6 +51,9 @@
     }
 
     try {
+      var profile = await window.ITBOY.api.getProfile(user.id);
+      var isPremium = profile.plan === 'premium';
+
       var habit = await window.ITBOY.api.getHabit(habitId);
       var logs = await window.ITBOY.api.getLogs(habitId);
       var dates = logs.map(function (l) { return l.completed_date; });
@@ -56,6 +62,9 @@
       nameEl.textContent = habit.name;
       categoryEl.textContent = window.ITBOY.CATEGORY_LABELS[habit.category] || habit.category;
 
+      // Le streak/taux se calcule TOUJOURS sur l'historique complet, même en
+      // Free : la limite d'affichage ne doit jamais fausser un vrai streak
+      // de plus de 30 jours (voir note dans plans.js).
       var current = window.ITBOY.streak.computeCurrentStreak(dates, today);
       var best = window.ITBOY.streak.computeBestStreak(dates);
       var rate7 = window.ITBOY.streak.completionRate(dates, 7, today);
@@ -67,7 +76,12 @@
         statTile(rate7 + '%', 'Sur 7 jours') +
         statTile(rate30 + '%', 'Sur 30 jours');
 
-      renderHeatmap(dates);
+      var heatmapDays = isPremium ? 90 : 30;
+      renderHeatmap(dates, heatmapDays);
+      var captionEl = document.getElementById('heatmap-caption');
+      if (captionEl) {
+        captionEl.textContent = isPremium ? '90 derniers jours' : '30 derniers jours — Premium débloque l\'historique complet';
+      }
     } catch (err) {
       window.ITBOY.ui.showError(bannerZone, err);
     }

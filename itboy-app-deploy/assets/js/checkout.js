@@ -22,6 +22,8 @@
     var user = await window.ITBOY.auth.requireUser('../login/');
     if (!user) return;
 
+    window.ITBOY.track('checkout_started', {}, user.id);
+
     try {
       var sessionRes = await window.ITBOY.supabase.auth.getSession();
       var accessToken = sessionRes && sessionRes.data && sessionRes.data.session && sessionRes.data.session.access_token;
