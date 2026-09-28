@@ -18,7 +18,11 @@
   var profile = null;
   var habits = [];      // habitudes actives
   var logsByHabit = {};  // habitId -> [completed_date, ...]
-  var todayStr = window.ITBOY.api.todayStr();
+
+  // Recalculee a chaque usage (jamais mise en cache) : si l'onglet reste
+  // ouvert a cheval sur minuit, un "coché aujourd'hui" doit refleter le
+  // nouveau jour, pas rester bloqué sur la date du chargement de la page.
+  function todayStr() { return window.ITBOY.api.todayStr(); }
 
   function planLimit() {
     return window.ITBOY.PLAN_LIMITS[profile.plan] || 3;
@@ -32,11 +36,11 @@
   }
 
   // 7 derniers jours (dont aujourd'hui), du plus ancien au plus recent -
-  // sert au mini historique par habitude et reutilise todayStr comme
+  // sert au mini historique par habitude et reutilise todayStr() comme
   // seule source de verite pour "aujourd'hui" (coherent avec le reste).
   function lastNDaysStr(n) {
     var pad = function (x) { return String(x).padStart(2, '0'); };
-    var parts = todayStr.split('-').map(Number);
+    var parts = todayStr().split('-').map(Number);
     var base = new Date(parts[0], parts[1] - 1, parts[2]);
     var out = [];
     for (var i = n - 1; i >= 0; i--) {
@@ -51,8 +55,9 @@
     if (!todayProgressEl) return;
     if (!habits.length) { todayProgressEl.innerHTML = ''; return; }
 
+    var today = todayStr();
     var doneCount = habits.filter(function (h) {
-      return (logsByHabit[h.id] || []).indexOf(todayStr) !== -1;
+      return (logsByHabit[h.id] || []).indexOf(today) !== -1;
     }).length;
     var pct = Math.round((doneCount / habits.length) * 100);
 
@@ -70,11 +75,12 @@
     }
 
     var week = lastNDaysStr(7);
+    var today = todayStr();
 
     listEl.innerHTML = habits.map(function (h) {
       var dates = logsByHabit[h.id] || [];
-      var doneToday = dates.indexOf(todayStr) !== -1;
-      var streak = window.ITBOY.streak.computeCurrentStreak(dates, todayStr);
+      var doneToday = dates.indexOf(today) !== -1;
+      var streak = window.ITBOY.streak.computeCurrentStreak(dates, today);
       var weekDots = week.map(function (d) {
         return '<span class="d' + (dates.indexOf(d) !== -1 ? ' done' : '') + '"></span>';
       }).join('');
@@ -101,16 +107,17 @@
 
   async function toggleToday(habitId) {
     bannerZone.innerHTML = '';
+    var today = todayStr();
     var dates = logsByHabit[habitId] || [];
-    var doneToday = dates.indexOf(todayStr) !== -1;
+    var doneToday = dates.indexOf(today) !== -1;
 
     try {
       if (doneToday) {
         await window.ITBOY.api.unmarkDoneToday(habitId);
-        logsByHabit[habitId] = dates.filter(function (d) { return d !== todayStr; });
+        logsByHabit[habitId] = dates.filter(function (d) { return d !== today; });
       } else {
         await window.ITBOY.api.markDoneToday(user.id, habitId);
-        logsByHabit[habitId] = dates.concat([todayStr]);
+        logsByHabit[habitId] = dates.concat([today]);
       }
       renderHabitList();
       renderTodayProgress();
