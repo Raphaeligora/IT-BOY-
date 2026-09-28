@@ -42,6 +42,7 @@
     var weeks = [];
     var monthLabels = [];
     var lastMonth = null;
+    var lastLabelWeek = -Infinity; // évite deux labels trop rapprochés (se chevaucheraient)
 
     for (var w = 0; w < weeksToShow; w++) {
       var weekStart = new Date(startMonday);
@@ -56,8 +57,11 @@
         weekCells.push({ str: str, done: !!done[str], future: cellDate > today });
 
         if (d === 0 && cellDate.getMonth() !== lastMonth) {
-          monthLabel = MONTH_ABBR[cellDate.getMonth()];
           lastMonth = cellDate.getMonth();
+          if (w - lastLabelWeek >= 3) {
+            monthLabel = MONTH_ABBR[cellDate.getMonth()];
+            lastLabelWeek = w;
+          }
         }
       }
 
