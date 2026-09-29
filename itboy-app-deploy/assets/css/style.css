@@ -1392,8 +1392,8 @@ button.action-chip:disabled { opacity: 0.5; cursor: not-allowed; transform: none
 .product-window-brand .logo-word { font-size: 9px; letter-spacing: 0.28em; }
 .product-window-head .tab-bar { margin: 0; }
 .product-window-body { padding: 30px 30px 6px; display: flex; flex-direction: column; align-items: center; }
-.product-window-body .tab-panel { width: 100%; display: flex; flex-direction: column; align-items: center; }
-.product-window-body .tab-panel.active { display: flex; }
+.product-window-body .tab-panel { width: 100%; }
+.product-window-body .tab-panel.active { display: flex; flex-direction: column; align-items: center; }
 
 @media (max-width: 560px) {
   .product-window-head { padding: 16px 18px; }
