@@ -914,6 +914,63 @@ a { color: var(--gold); text-decoration: none; }
   font-size: 13.5px;
 }
 
+/* Page /stats/combined — selection multi-habitudes (chips a bascule,
+   plusieurs actives a la fois, contrairement a .tab-bar) + une carte
+   .compare-card par habitude selectionnee (metriques + heatmap annee). */
+.select-chip-row {
+  width: 100%;
+  max-width: 720px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.select-chip {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 12.5px;
+  color: var(--grey);
+  background: var(--bg-card);
+  border: 1px solid rgba(246,246,246,0.14);
+  border-radius: 999px;
+  padding: 9px 16px;
+  cursor: pointer;
+  transition: border-color 0.18s, color 0.18s, background 0.18s;
+}
+.select-chip:hover { color: var(--white); }
+.select-chip.active { background: rgba(205,163,78,0.14); border-color: var(--gold); color: var(--gold); }
+.select-chip:disabled { opacity: 0.35; cursor: not-allowed; }
+.select-chip-note {
+  width: 100%;
+  max-width: 720px;
+  font-size: 12px;
+  color: var(--grey);
+  margin: 0 0 28px;
+}
+
+.compare-card {
+  width: 100%;
+  max-width: 720px;
+  background: var(--bg-card);
+  border: 1px solid rgba(246,246,246,0.1);
+  border-radius: 2px;
+  padding: 22px;
+  margin-bottom: 20px;
+}
+.compare-card .compare-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+.compare-card .compare-name { font-family: 'Cinzel', serif; font-size: 15px; color: var(--white); }
+.compare-card .compare-category { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--grey); margin-left: 10px; }
+.compare-card .compare-metrics { display: flex; gap: 22px; }
+.compare-card .compare-metrics .metric { text-align: center; }
+.compare-card .compare-metrics .metric .value { font-family: 'Cinzel', serif; font-size: 16px; color: var(--gold); }
+.compare-card .compare-metrics .metric .label { font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--grey); }
+
 /* ---- Landing : nav ---- */
 .landing-nav {
   width: 100%;

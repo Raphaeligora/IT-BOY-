@@ -26,12 +26,16 @@
   // Barre de nav partagée (dashboard, détail d'habitude, statistiques) —
   // un seul point de vérité pour les onglets et le bouton déconnexion,
   // plutôt que dupliquer le markup dans chaque page HTML statique.
+  // Liens en racine absolue (/dashboard/, /stats/) plutôt que relatifs :
+  // ce même markup est injecté depuis des pages a des profondeurs
+  // differentes (/dashboard/, /habits/, /stats/combined/...) ou "../"
+  // ne pointerait pas toujours au meme endroit.
   function renderNav(active) {
     return '<nav class="app-nav"><div class="app-nav-inner">' +
-      '<a href="../dashboard/" class="logo-mark" style="font-size:19px"><span class="i">I</span><span class="b">B</span></a>' +
+      '<a href="/dashboard/" class="logo-mark" style="font-size:19px"><span class="i">I</span><span class="b">B</span></a>' +
       '<div class="app-nav-tabs">' +
-      '<a href="../dashboard/" class="app-nav-tab' + (active === 'dashboard' ? ' active' : '') + '">Tableau de bord</a>' +
-      '<a href="../stats/" class="app-nav-tab' + (active === 'stats' ? ' active' : '') + '">Statistiques</a>' +
+      '<a href="/dashboard/" class="app-nav-tab' + (active === 'dashboard' ? ' active' : '') + '">Tableau de bord</a>' +
+      '<a href="/stats/" class="app-nav-tab' + (active === 'stats' ? ' active' : '') + '">Statistiques</a>' +
       '</div>' +
       '<button class="link-muted app-nav-logout" id="logout-btn" type="button">Se déconnecter</button>' +
       '</div></nav>';

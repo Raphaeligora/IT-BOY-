@@ -11,11 +11,13 @@
   }
 
   // Redirige vers la page de login si personne n'est connecté.
-  // Retourne l'utilisateur sinon.
+  // Retourne l'utilisateur sinon. loginPath par defaut en racine absolue
+  // (pas '../login/') : ce helper est appele depuis des pages a des
+  // profondeurs differentes (/dashboard/, /stats/combined/...).
   async function requireUser(loginPath) {
     var user = await getUser();
     if (!user) {
-      window.location.href = loginPath || '../login/';
+      window.location.href = loginPath || '/login/';
       return null;
     }
     return user;
@@ -38,7 +40,7 @@
 
   async function signOut() {
     if (client()) await client().auth.signOut();
-    window.location.href = '../login/';
+    window.location.href = '/login/';
   }
 
   // Envoie un email avec un lien de reinitialisation. Le lien renvoie sur
