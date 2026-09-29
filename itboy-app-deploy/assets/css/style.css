@@ -650,7 +650,7 @@ button.action-chip:disabled { opacity: 0.5; cursor: not-allowed; transform: none
 
 .habit-row {
   display: grid;
-  grid-template-columns: auto 1fr auto auto;
+  grid-template-columns: auto auto 1fr auto auto;
   align-items: center;
   column-gap: 12px;
   row-gap: 10px;
@@ -667,18 +667,19 @@ button.action-chip:disabled { opacity: 0.5; cursor: not-allowed; transform: none
    eviter qu'un element seul sur sa ligne ne s'etire a 100% de large.
    Cas par defaut (page archivee : juste .info + .reactivate-btn, une
    seule ligne) : */
-.habit-row .info { grid-column: 1 / span 3; grid-row: 1; min-width: 0; }
-.habit-row .reactivate-btn { grid-column: 4; grid-row: 1; justify-self: end; }
+.habit-row .info { grid-column: 1 / span 4; grid-row: 1; min-width: 0; }
+.habit-row .reactivate-btn { grid-column: 5; grid-row: 1; justify-self: end; }
 /* Cas dashboard (case a cocher presente) : ligne 1 = poignee + case +
    infos + archiver ; ligne 2 = streak + freeze + detail, chacun dans
-   sa propre colonne (pas d'etirement force). */
-.habit-row:has(.habit-checkbox) .drag-handle,
-.habit-row:has(.habit-checkbox) .habit-checkbox { grid-column: 1; grid-row: 1; }
-.habit-row:has(.habit-checkbox) .info { grid-column: 2 / span 2; grid-row: 1; }
-.habit-row:has(.habit-checkbox) .archive-btn { grid-column: 4; grid-row: 1; justify-self: end; }
-.habit-row:has(.habit-checkbox) .streak-indicator { grid-column: 1 / span 2; grid-row: 2; justify-self: start; }
-.habit-row:has(.habit-checkbox) .freeze-btn { grid-column: 3; grid-row: 2; justify-self: center; }
-.habit-row:has(.habit-checkbox) a.detail-link { grid-column: 4; grid-row: 2; justify-self: end; }
+   sa propre colonne (pas d'etirement force, pas de chevauchement
+   poignee/case grace a leurs colonnes dediees). */
+.habit-row:has(.habit-checkbox) .drag-handle { grid-column: 1; grid-row: 1; }
+.habit-row:has(.habit-checkbox) .habit-checkbox { grid-column: 2; grid-row: 1; }
+.habit-row:has(.habit-checkbox) .info { grid-column: 3; grid-row: 1; }
+.habit-row:has(.habit-checkbox) .archive-btn { grid-column: 5; grid-row: 1; justify-self: end; }
+.habit-row:has(.habit-checkbox) .streak-indicator { grid-column: 1 / span 3; grid-row: 2; justify-self: start; }
+.habit-row:has(.habit-checkbox) .freeze-btn { grid-column: 4; grid-row: 2; justify-self: center; }
+.habit-row:has(.habit-checkbox) a.detail-link { grid-column: 5; grid-row: 2; justify-self: end; }
 .habit-row::before {
   content: '';
   position: absolute;
