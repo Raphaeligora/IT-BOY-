@@ -3,12 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
 <link rel="icon" href="/favicon.ico" sizes="any" />
 <link rel="icon" href="/assets/icons/icon-192.png" type="image/png" />
 <link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png" />
-<link rel="manifest" href="/manifest.json" />
 <meta name="theme-color" content="#0A1322" />
-<title>Mot de passe oublié — IT BOY</title>
+<title>Dashboard interne — IT BOY</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet" />
@@ -16,31 +16,32 @@
 </head>
 <body>
 
-<div class="page-shell">
-  <a href="../" class="logo-mark" style="font-size:22px">
-    <span class="i">I</span><span class="b">B</span>
-  </a>
-  <h1 class="page-title font-cinzel">Mot de passe oublié</h1>
-  <p class="page-subtitle">Indique ton email, on t'envoie un lien pour en choisir un nouveau.</p>
+<nav class="app-nav"><div class="app-nav-inner">
+  <a href="../dashboard/" class="logo-mark" style="font-size:19px"><span class="i">I</span><span class="b">B</span></a>
+  <div class="app-nav-tabs">
+    <a href="../dashboard/" class="app-nav-tab">Tableau de bord</a>
+    <a href="../stats/" class="app-nav-tab">Statistiques</a>
+    <span class="app-nav-tab active" style="cursor:default">Dashboard interne</span>
+  </div>
+  <button class="link-muted app-nav-logout" id="logout-btn" type="button">Se déconnecter</button>
+</div></nav>
 
-  <div id="banner-zone" style="width:100%;max-width:380px"></div>
+<div class="page-shell" style="padding-top:36px">
+  <h1 class="page-title font-cinzel">Dashboard interne</h1>
+  <p class="page-subtitle">Vues, clics, ce qui marche — visible seulement par toi.</p>
 
-  <form class="form" id="forgot-form">
-    <label class="form-label">Email
-      <input class="form-input" type="email" name="email" required autocomplete="email" />
-    </label>
-    <button class="cta-btn" type="submit" id="submit-btn" style="margin-top:8px">Envoyer le lien</button>
-  </form>
+  <div id="banner-zone" style="width:100%;max-width:820px"></div>
 
-  <p class="form-note"><a href="../login/">&larr; Retour à la connexion</a></p>
+  <div id="admin-zone" style="width:100%;max-width:820px;margin-top:16px"></div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="../assets/js/lib/config.js"></script>
 <script src="../assets/js/lib/supabaseClient.js"></script>
 <script src="../assets/js/lib/track.js"></script>
 <script src="../assets/js/lib/ui.js"></script>
 <script src="../assets/js/lib/auth.js"></script>
-<script src="../assets/js/forgotPassword.js"></script>
+<script src="../assets/js/admin.js"></script>
 </body>
 </html>

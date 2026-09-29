@@ -1065,6 +1065,21 @@ button.action-chip:disabled { opacity: 0.5; cursor: not-allowed; transform: none
 }
 .chart-legend .swatch { display: inline-block; width: 9px; height: 9px; border-radius: 2px; margin-right: 6px; vertical-align: middle; }
 
+/* Barre de progression generique (classements type "top N" — ex. dashboard
+   interne /admin/, assets/js/admin.js renderTopList()). */
+.bar-track {
+  width: 100%;
+  height: 6px;
+  background: rgba(246,246,246,0.08);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.bar-track .bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(205,163,78,0.6), var(--gold));
+}
+
 .locked-card {
   width: 100%;
   background: linear-gradient(155deg, rgba(205,163,78,0.05), transparent 60%);

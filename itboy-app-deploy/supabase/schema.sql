@@ -347,3 +347,19 @@ alter table public.habit_logs add column if not exists source text not null defa
 alter table public.habits add column if not exists type text not null default 'habit' check (type in ('habit', 'tracker'));
 alter table public.habits add column if not exists description text;
 alter table public.habits add column if not exists color text;
+
+-- ============================================================
+-- 11. Dashboard interne (2026-09-29) - la table `events` (section 7b)
+--     n'etait lisible que par le service role (Supabase SQL editor).
+--     On ouvre la lecture UNIQUEMENT au proprietaire du produit
+--     (verifie par email, pas par role, puisqu'il n'y a pas de
+--     notion d'admin/role ailleurs dans le schema) pour un dashboard
+--     prive /admin/ dans l'app : nombre de vues par page, clics par
+--     bouton (voir data-track dans le HTML + assets/js/lib/track.js).
+--     Toujours pas expose a un visiteur normal : la policy insert
+--     existante (events_insert_anyone) ne change pas.
+-- ============================================================
+
+create policy "events_select_owner"
+  on public.events for select
+  using ((auth.jwt() ->> 'email') = 'raphaeligora@gmail.com');
