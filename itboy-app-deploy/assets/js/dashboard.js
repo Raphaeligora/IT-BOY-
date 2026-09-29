@@ -15,14 +15,21 @@
   var frequencySelect = document.getElementById('frequency-select');
   var frequencyCountLabel = document.getElementById('frequency-count-label');
 
+  var sortToggleEl = document.getElementById('sort-toggle');
+  var greetingEl = document.getElementById('greeting');
+
   var user = null;
   var profile = null;
-  var habits = [];      // habitudes actives
+  var habits = [];      // habitudes actives, dans l'ordre "position" (tri manuel) tel que renvoye par l'API
   var logsByHabit = {};  // habitId -> [completed_date, ...]
   // Total de coches tous logs confondus (y compris habitudes archivees,
   // cf. getLogsForUser) - tenu a jour localement sans refetch a chaque
   // coche/decoche pour le bandeau de vue d'ensemble.
   var totalCheckins = 0;
+  // 'activity' (par defaut) : la plus recemment cochee en premier.
+  // 'manual' : ordre choisi par glisser-deposer, persiste en base (habits.position).
+  var sortMode = 'activity';
+  var draggedHabitId = null;
 
   // Recalculee a chaque usage (jamais mise en cache) : si l'onglet reste
   // ouvert a cheval sur minuit, un "coché aujourd'hui" doit refleter le
@@ -90,6 +97,21 @@
       '</div>';
   }
 
+  // "Par activité" : la plus recemment cochee en premier (habitude jamais
+  // cochee = renvoyee a la fin). "Manuel" : ordre "position" tel que recu
+  // de l'API (habits n'est jamais re-trie dans ce mode).
+  function displayHabits() {
+    if (sortMode !== 'activity') return habits;
+    return habits.slice().sort(function (a, b) {
+      var datesA = logsByHabit[a.id] || [];
+      var datesB = logsByHabit[b.id] || [];
+      var lastA = datesA.length ? datesA.slice().sort().pop() : '';
+      var lastB = datesB.length ? datesB.slice().sort().pop() : '';
+      if (lastA === lastB) return a.name.localeCompare(b.name);
+      return lastA < lastB ? 1 : -1;
+    });
+  }
+
   function renderHabitList() {
     if (!habits.length) {
       listEl.innerHTML = '<p class="page-subtitle" style="margin:0">Aucune habitude active pour l\'instant.</p>';
@@ -98,15 +120,17 @@
 
     var week = lastNDaysStr(7);
     var today = todayStr();
+    var manual = sortMode === 'manual';
 
-    listEl.innerHTML = habits.map(function (h) {
+    listEl.innerHTML = displayHabits().map(function (h) {
       var dates = logsByHabit[h.id] || [];
       var doneToday = dates.indexOf(today) !== -1;
       var streak = window.ITBOY.streak.computeCurrentStreak(dates, today);
       var weekDots = week.map(function (d) {
         return '<span class="d' + (dates.indexOf(d) !== -1 ? ' done' : '') + '"></span>';
       }).join('');
-      return '<div class="habit-row" data-habit-id="' + h.id + '">' +
+      return '<div class="habit-row' + (manual ? ' draggable' : '') + '" data-habit-id="' + h.id + '"' + (manual ? ' draggable="true"' : '') + '>' +
+        (manual ? '<span class="drag-handle" aria-hidden="true">⠿</span>' : '') +
         '<button class="habit-checkbox' + (doneToday ? ' done' : '') + '" data-action="toggle" aria-label="Fait aujourd\'hui"></button>' +
         '<div class="info">' +
         '<span class="name">' + window.ITBOY.ui.escapeHtml(h.name) + '</span>' +
@@ -124,6 +148,43 @@
     });
     listEl.querySelectorAll('[data-action="archive"]').forEach(function (btn) {
       btn.addEventListener('click', function () { archiveHabit(btn.closest('.habit-row').getAttribute('data-habit-id')); });
+    });
+
+    if (manual) bindDragAndDrop();
+  }
+
+  // Glisser-deposer natif (HTML5 drag events) pour le tri "Manuel" - pas
+  // besoin de librairie externe pour reordonner une petite liste.
+  function bindDragAndDrop() {
+    listEl.querySelectorAll('.habit-row.draggable').forEach(function (row) {
+      row.addEventListener('dragstart', function () {
+        draggedHabitId = row.getAttribute('data-habit-id');
+        row.classList.add('dragging');
+      });
+      row.addEventListener('dragend', function () {
+        draggedHabitId = null;
+        row.classList.remove('dragging');
+      });
+      row.addEventListener('dragover', function (e) {
+        e.preventDefault();
+      });
+      row.addEventListener('drop', function (e) {
+        e.preventDefault();
+        var targetId = row.getAttribute('data-habit-id');
+        if (!draggedHabitId || draggedHabitId === targetId) return;
+
+        var fromIdx = habits.findIndex(function (h) { return h.id === draggedHabitId; });
+        var toIdx = habits.findIndex(function (h) { return h.id === targetId; });
+        if (fromIdx === -1 || toIdx === -1) return;
+
+        var moved = habits.splice(fromIdx, 1)[0];
+        habits.splice(toIdx, 0, moved);
+        renderHabitList();
+
+        window.ITBOY.api.reorderHabits(habits.map(function (h) { return h.id; })).catch(function (err) {
+          window.ITBOY.ui.showError(bannerZone, err);
+        });
+      });
     });
   }
 
@@ -192,7 +253,8 @@
       var wasFirstHabit = habits.length === 0;
       var habit = await window.ITBOY.api.createHabit(user.id, {
         name: name, category: category, frequency: frequency,
-        frequencyPerWeek: frequencyPerWeek, source: 'custom'
+        frequencyPerWeek: frequencyPerWeek, source: 'custom',
+        position: habits.length + 1
       });
       habits.push(habit);
       logsByHabit[habit.id] = [];
@@ -208,9 +270,19 @@
     }
   });
 
-  document.getElementById('logout-btn').addEventListener('click', function () {
-    window.ITBOY.auth.signOut();
-  });
+  if (sortToggleEl) {
+    sortToggleEl.querySelectorAll('[data-sort]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var mode = btn.getAttribute('data-sort');
+        if (mode === sortMode) return;
+        sortMode = mode;
+        sortToggleEl.querySelectorAll('[data-sort]').forEach(function (b) {
+          b.classList.toggle('active', b === btn);
+        });
+        renderHabitList();
+      });
+    });
+  }
 
   async function init() {
     if (!window.ITBOY.isSupabaseConfigured) {
@@ -221,12 +293,19 @@
     user = await window.ITBOY.auth.requireUser('../login/');
     if (!user) return;
 
+    window.ITBOY.ui.mountNav('dashboard');
+
     try {
       profile = await window.ITBOY.api.getProfile(user.id);
 
       if (!profile.onboarded) {
         window.location.href = '../plans/';
         return;
+      }
+
+      if (greetingEl) {
+        var displayName = (user.email || '').split('@')[0];
+        greetingEl.textContent = 'Bonjour, ' + displayName + ' !';
       }
 
       habits = await window.ITBOY.api.getHabits(user.id, { archived: false });

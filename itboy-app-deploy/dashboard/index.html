@@ -11,21 +11,32 @@
 </head>
 <body>
 
+<div id="nav-mount"></div>
+
 <div class="page-shell" style="padding-top:36px">
-  <div class="dashboard-header">
-    <a href="../" class="logo-mark" style="font-size:20px">
-      <span class="i">I</span><span class="b">B</span>
-    </a>
-    <button class="link-muted" id="logout-btn" type="button" style="background:none;border:none;cursor:pointer;font-family:Montserrat,sans-serif">Se deconnecter</button>
+  <div class="dashboard-greeting">
+    <h1 class="font-cinzel" id="greeting">Bonjour !</h1>
+    <p id="greeting-subtitle">Aperçu</p>
   </div>
 
   <div id="banner-zone" style="width:100%;max-width:640px"></div>
 
   <div class="overview-stats" id="overview-stats"></div>
 
+  <div class="dashboard-actions">
+    <a class="action-chip" href="../stats/combined/">Comparer les calendriers</a>
+    <a class="action-chip" href="../stats/">Statistiques détaillées</a>
+  </div>
+
   <p class="plan-limit-note" id="plan-limit-note"></p>
 
-  <div class="section-heading">Aujourd'hui</div>
+  <div class="section-heading-row">
+    <div class="section-heading" style="margin:0">Aujourd'hui</div>
+    <div class="tab-bar" id="sort-toggle" style="margin:0">
+      <button class="tab-btn active" type="button" data-sort="activity">Par activité</button>
+      <button class="tab-btn" type="button" data-sort="manual">Manuel</button>
+    </div>
+  </div>
   <div id="today-progress"></div>
   <div class="habit-list" id="habit-list"></div>
 

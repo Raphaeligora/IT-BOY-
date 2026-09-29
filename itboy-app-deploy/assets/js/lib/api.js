@@ -27,7 +27,7 @@
 
    async function getHabits(userId, opts) {
           opts = opts || {};
-          var query = db().from('habits').select('*').eq('user_id', userId).order('created_at', { ascending: true });
+          var query = db().from('habits').select('*').eq('user_id', userId).order('position', { ascending: true });
           if (opts.archived === false) query = query.eq('archived', false);
           var res = await query;
           if (res.error) throw res.error;
@@ -48,7 +48,8 @@
                    frequency: habit.frequency || 'daily',
                    frequency_per_week: habit.frequencyPerWeek || null,
                    archived: false,
-                   source: habit.source || 'custom'
+                   source: habit.source || 'custom',
+                   position: habit.position || 0
           }).select().single();
           if (res.error) throw res.error;
           return res.data;
@@ -57,6 +58,16 @@
    async function archiveHabit(habitId) {
           var res = await db().from('habits').update({ archived: true }).eq('id', habitId);
           if (res.error) throw res.error;
+   }
+
+   // Tri manuel (glisser-deposer sur le dashboard) : persiste le nouvel
+   // ordre. Une mise a jour par habitude - la liste est petite (limite
+   // de plan ou confort d'usage en Premium), pas besoin de RPC batch.
+   async function reorderHabits(orderedHabitIds) {
+          for (var i = 0; i < orderedHabitIds.length; i++) {
+                   var res = await db().from('habits').update({ position: i + 1 }).eq('id', orderedHabitIds[i]);
+                   if (res.error) throw res.error;
+          }
    }
 
    async function getLogs(habitId) {
@@ -94,6 +105,7 @@
             getHabit: getHabit,
             createHabit: createHabit,
             archiveHabit: archiveHabit,
+            reorderHabits: reorderHabits,
             getLogs: getLogs,
             getLogsForUser: getLogsForUser,
             markDoneToday: markDoneToday,

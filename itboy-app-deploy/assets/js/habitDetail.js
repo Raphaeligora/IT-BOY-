@@ -90,6 +90,8 @@
     var user = await window.ITBOY.auth.requireUser('../login/');
     if (!user) return;
 
+    window.ITBOY.ui.mountNav('');
+
     var habitId = getHabitIdFromQuery();
     if (!habitId) {
       window.ITBOY.ui.showError(bannerZone, new Error('Aucune habitude spécifiée.'));

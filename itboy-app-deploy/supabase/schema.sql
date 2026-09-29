@@ -297,3 +297,24 @@ create policy "events_insert_anyone"
 
 create index if not exists events_name_idx on public.events (name);
 create index if not exists events_user_id_idx on public.events (user_id);
+
+-- ============================================================
+-- 8. Migration refonte dashboard (2026-09-29) - tri manuel des
+--    habitudes (glisser-deposer sur /dashboard, cf. habitracker.cc).
+--    position : ordre choisi par l'utilisateur, uniquement utilise
+--    quand il selectionne le tri "Manuel" (par defaut le tri "Par
+--    activite" reste calcule cote client depuis habit_logs, pas
+--    besoin de colonne). Nouvelle habitude = position max + 1.
+-- ============================================================
+
+alter table public.habits add column if not exists position integer not null default 0;
+
+-- Backfill : position = ordre de creation existant, par utilisateur,
+-- pour un tri manuel initial coherent avant le premier reordering.
+update public.habits h
+set position = sub.rn
+from (
+  select id, row_number() over (partition by user_id order by created_at asc) as rn
+  from public.habits
+) sub
+where h.id = sub.id and h.position = 0;
