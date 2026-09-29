@@ -28,8 +28,17 @@
    async function getHabits(userId, opts) {
           opts = opts || {};
           var query = db().from('habits').select('*').eq('user_id', userId).order('position', { ascending: true });
-          if (opts.archived === false) query = query.eq('archived', false);
+          if (opts.archived === false || opts.archived === true) query = query.eq('archived', opts.archived);
           var res = await query;
+          if (res.error) throw res.error;
+          return res.data;
+   }
+
+   // Habitudes archivees (manuellement ou via le downgrade Premium->Free,
+   // cf. enforce_plan_downgrade) - triees par date d'archivage/creation
+   // la plus recente d'abord, "position" n'ayant plus de sens ici.
+   async function getArchivedHabits(userId) {
+          var res = await db().from('habits').select('*').eq('user_id', userId).eq('archived', true).order('created_at', { ascending: false });
           if (res.error) throw res.error;
           return res.data;
    }
@@ -57,6 +66,15 @@
 
    async function archiveHabit(habitId) {
           var res = await db().from('habits').update({ archived: true }).eq('id', habitId);
+          if (res.error) throw res.error;
+   }
+
+   // Reactive une habitude archivee. Le trigger enforce_habit_limit (voir
+   // schema.sql) rejette en base si le plan free a deja 3 habitudes
+   // actives - l'erreur Postgres brute remonte telle quelle a l'appelant,
+   // meme mecanisme que createHabit.
+   async function reactivateHabit(habitId, position) {
+          var res = await db().from('habits').update({ archived: false, position: position || 0 }).eq('id', habitId);
           if (res.error) throw res.error;
    }
 
@@ -102,9 +120,11 @@
             getProfile: getProfile,
             markOnboarded: markOnboarded,
             getHabits: getHabits,
+            getArchivedHabits: getArchivedHabits,
             getHabit: getHabit,
             createHabit: createHabit,
             archiveHabit: archiveHabit,
+            reactivateHabit: reactivateHabit,
             reorderHabits: reorderHabits,
             getLogs: getLogs,
             getLogsForUser: getLogsForUser,
