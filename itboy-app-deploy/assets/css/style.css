@@ -1093,6 +1093,7 @@ button.action-chip:disabled { opacity: 0.5; cursor: not-allowed; transform: none
   justify-content: center;
   padding: 20px;
 }
+.pwa-modal-overlay[hidden] { display: none; }
 .pwa-modal {
   position: relative;
   width: 100%;
