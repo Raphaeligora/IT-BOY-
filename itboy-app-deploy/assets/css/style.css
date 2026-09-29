@@ -1350,11 +1350,11 @@ button.action-chip:disabled { opacity: 0.5; cursor: not-allowed; transform: none
 @keyframes tab-progress { from { width: 0%; } to { width: 100%; } }
 
 .tab-caption {
-  margin: -14px 0 26px;
-  font-size: 13px;
+  padding: 0 28px;
+  font-size: 13.5px;
   color: #8A8A8A;
   text-align: center;
-  max-width: 34ch;
+  max-width: 46ch;
   min-height: 1.5em;
 }
 
@@ -1362,62 +1362,101 @@ button.action-chip:disabled { opacity: 0.5; cursor: not-allowed; transform: none
   .tab-btn.active.autoplaying::after { animation: none; }
 }
 
-/* ---- Landing : aperçu produit (mockup statique) ---- */
+/* ---- Landing : aperçu produit — grande fenêtre "app" ----
+   Inspirée du carrousel automatique de habitracker.cc : un seul grand
+   cadre façon fenêtre d'app (logo + onglets dans un bandeau d'en-tête),
+   beaucoup plus large et spacieux que l'ancien mockup-card centré à
+   420px, avec les mêmes composants réels du dashboard (habit-stats,
+   heatmap) qui peuvent enfin respirer à leur taille naturelle. */
+.product-window {
+  width: 100%;
+  max-width: 720px;
+  background: linear-gradient(155deg, var(--bg-card-2) 0%, var(--bg-card) 55%, #0D1727 100%);
+  border: 1px solid var(--line-strong);
+  border-radius: 24px;
+  box-shadow: 0 50px 100px -35px rgba(0,0,0,0.8), 0 1px 0 rgba(255,255,255,0.04) inset;
+  padding-bottom: 8px;
+  overflow: hidden;
+}
+.product-window-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding: 20px 28px;
+  border-bottom: 1px solid var(--line);
+}
+.product-window-brand { display: flex; align-items: center; gap: 9px; }
+.product-window-brand .logo-mark { font-size: 17px; }
+.product-window-brand .logo-word { font-size: 9px; letter-spacing: 0.28em; }
+.product-window-head .tab-bar { margin: 0; }
+.product-window-body { padding: 30px 30px 6px; display: flex; flex-direction: column; align-items: center; }
+.product-window-body .tab-panel { width: 100%; display: flex; flex-direction: column; align-items: center; }
+.product-window-body .tab-panel.active { display: flex; }
+
+@media (max-width: 560px) {
+  .product-window-head { padding: 16px 18px; }
+  .product-window-body { padding: 24px 16px 6px; }
+}
+
+/* ---- Landing : aperçu produit (contenu, échelle "vrai dashboard") ---- */
 .mockup-card {
   width: 100%;
-  max-width: 420px;
-  background: var(--bg-card);
-  border: 1px solid rgba(246,246,246,0.08);
-  border-radius: 14px;
-  padding: 26px 24px;
-  box-shadow: 0 30px 70px -40px rgba(0,0,0,0.7);
+  max-width: 560px;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  padding: 0;
+  box-shadow: none;
 }
 .mockup-card-head {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 18px;
+  margin-bottom: 6px;
 }
-.mockup-card-head .title { font-family: 'Cinzel', serif; font-size: 13px; letter-spacing: 0.08em; color: var(--white); }
-.mockup-card-head .frac { font-size: 12px; color: var(--gold); }
+.mockup-card-head .title { font-family: 'Cinzel', serif; font-size: 16px; letter-spacing: 0.06em; color: var(--white); }
+.mockup-card-head .frac { font-size: 13.5px; color: var(--gold); }
+.mockup-overview { margin: 0 0 22px; font-size: 12.5px; color: var(--grey); }
 .mockup-track {
   width: 100%;
-  height: 4px;
+  height: 6px;
   background: rgba(246,246,246,0.1);
-  border-radius: 2px;
+  border-radius: 3px;
   overflow: hidden;
-  margin-bottom: 22px;
+  margin-bottom: 26px;
 }
-.mockup-track .fill { height: 100%; width: 75%; background: var(--gold); }
+.mockup-track .fill { height: 100%; width: 75%; background: linear-gradient(90deg, var(--gold-bright), var(--gold)); }
 .mockup-row {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 12px 0;
+  gap: 16px;
+  padding: 16px 0;
   border-top: 1px solid rgba(246,246,246,0.07);
 }
 .mockup-row:first-of-type { border-top: none; }
 .mockup-dot {
-  width: 20px; height: 20px;
+  width: 26px; height: 26px;
   border-radius: 50%;
-  border: 1.5px solid var(--mockup-accent, rgba(205,163,78,0.5));
+  border: 2px solid var(--mockup-accent, rgba(205,163,78,0.5));
   flex: none;
 }
-.mockup-dot.done { background: var(--mockup-accent, var(--gold)); border-color: var(--mockup-accent, var(--gold)); }
-.mockup-row .info { flex: 1; display: flex; flex-direction: column; gap: 5px; min-width: 0; }
-.mockup-row .name { font-size: 13px; color: var(--white); }
-.mockup-row .mini-week { display: flex; gap: 4px; }
-.mockup-row .mini-week span { width: 6px; height: 6px; border-radius: 50%; background: rgba(246,246,246,0.12); }
+.mockup-dot.done { background: var(--mockup-accent, var(--gold)); border-color: var(--mockup-accent, var(--gold)); box-shadow: 0 0 0 4px color-mix(in srgb, var(--mockup-accent, var(--gold)) 16%, transparent); }
+.mockup-row .info { flex: 1; display: flex; flex-direction: column; gap: 7px; min-width: 0; }
+.mockup-row .name { font-size: 15px; color: var(--white); }
+.mockup-row .mini-week { display: flex; gap: 5px; }
+.mockup-row .mini-week span { width: 7px; height: 7px; border-radius: 50%; background: rgba(246,246,246,0.12); }
 .mockup-row .mini-week span.done { background: var(--mockup-accent, var(--gold)); }
-.mockup-row .streak { display: flex; align-items: center; gap: 5px; font-size: 12px; color: var(--mockup-accent, var(--gold)); white-space: nowrap; }
+.mockup-row .streak { display: flex; align-items: center; gap: 5px; font-size: 13.5px; color: var(--mockup-accent, var(--gold)); white-space: nowrap; }
 .mockup-row .streak.tracker-tag {
-  font-size: 9px;
+  font-size: 10px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   background: color-mix(in srgb, var(--mockup-accent, var(--gold)) 14%, transparent);
   border: 1px solid color-mix(in srgb, var(--mockup-accent, var(--gold)) 30%, transparent);
   border-radius: 999px;
-  padding: 3px 8px;
+  padding: 4px 10px;
 }
 
 /* ---- Landing : grille de fonctionnalités ---- */
