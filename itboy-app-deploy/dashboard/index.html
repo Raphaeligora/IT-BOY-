@@ -52,10 +52,16 @@
   <button class="add-habit-btn" id="add-habit-toggle" type="button">+ Ajouter une habitude</button>
 
   <form class="form" id="add-habit-form" style="display:none;margin-top:20px">
+    <label class="form-label">Type
+      <select class="form-select" name="type" id="type-select">
+        <option value="habit">Habitude (avec streak)</option>
+        <option value="tracker">Tracker simple (sans streak)</option>
+      </select>
+    </label>
     <label class="form-label">Nom
       <input class="form-input" type="text" name="name" required />
     </label>
-    <label class="form-label">Categorie
+    <label class="form-label">Domaine
       <select class="form-select" name="category" required>
         <option value="sante">Sante</option>
         <option value="productivite">Productivite</option>
@@ -63,7 +69,21 @@
         <option value="finance">Finances</option>
       </select>
     </label>
-    <label class="form-label">Frequence
+    <label class="form-label">Description <span class="link-muted" style="font-weight:400">(optionnel)</span>
+      <textarea class="form-input" name="description" rows="2" maxlength="240" placeholder="Pourquoi cette habitude compte pour toi..."></textarea>
+    </label>
+    <label class="form-label">Couleur
+      <div class="color-picker" id="color-picker">
+        <button type="button" class="color-swatch active" data-color="#CDA34E" style="background:#CDA34E" aria-label="Or"></button>
+        <button type="button" class="color-swatch" data-color="#7FB3D5" style="background:#7FB3D5" aria-label="Bleu"></button>
+        <button type="button" class="color-swatch" data-color="#8FC1A9" style="background:#8FC1A9" aria-label="Vert"></button>
+        <button type="button" class="color-swatch" data-color="#D98880" style="background:#D98880" aria-label="Corail"></button>
+        <button type="button" class="color-swatch" data-color="#C39BD3" style="background:#C39BD3" aria-label="Violet"></button>
+        <button type="button" class="color-swatch" data-color="#F0B27A" style="background:#F0B27A" aria-label="Ambre"></button>
+      </div>
+      <input type="hidden" name="color" id="color-input" value="#CDA34E" />
+    </label>
+    <label class="form-label" id="frequency-wrap">Frequence
       <select class="form-select" name="frequency" id="frequency-select">
         <option value="daily">Quotidienne</option>
         <option value="weekly">X fois par semaine</option>

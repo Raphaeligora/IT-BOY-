@@ -14,6 +14,10 @@
   var addForm = document.getElementById('add-habit-form');
   var frequencySelect = document.getElementById('frequency-select');
   var frequencyCountLabel = document.getElementById('frequency-count-label');
+  var frequencyWrap = document.getElementById('frequency-wrap');
+  var typeSelect = document.getElementById('type-select');
+  var colorPicker = document.getElementById('color-picker');
+  var colorInput = document.getElementById('color-input');
 
   var sortToggleEl = document.getElementById('sort-toggle');
   var greetingEl = document.getElementById('greeting');
@@ -74,7 +78,7 @@
     // habitude hebdomadaire a sa propre notion de serie, en semaines -
     // voir renderHabitList - donc exclue de ce tuile pour ne pas melanger
     // deux unites differentes dans le meme chiffre).
-    var bestStreak = habits.filter(function (h) { return h.frequency !== 'weekly'; }).reduce(function (max, h) {
+    var bestStreak = habits.filter(function (h) { return h.frequency !== 'weekly' && h.type !== 'tracker'; }).reduce(function (max, h) {
       var streak = window.ITBOY.streak.computeCurrentStreak(logsByHabit[h.id] || [], today);
       return Math.max(max, streak);
     }, 0);
@@ -160,7 +164,10 @@
     if (!habit) return;
     var today = todayStr();
 
-    if (habit.frequency === 'weekly') {
+    if (habit.type === 'tracker') {
+      // Pas de notion de streak pour un tracker simple : pas de
+      // celebration de série, seulement le bilan "journée complète" ci-dessous.
+    } else if (habit.frequency === 'weekly') {
       var target = habit.frequency_per_week || 1;
       var weekCount = window.ITBOY.streak.completionsThisWeek(logsByHabit[habitId] || [], today);
       if (weekCount === target) {
@@ -214,13 +221,18 @@
     listEl.innerHTML = displayHabits().map(function (h) {
       var dates = logsByHabit[h.id] || [];
       var doneToday = dates.indexOf(today) !== -1;
-      var isWeekly = h.frequency === 'weekly';
+      var isTracker = h.type === 'tracker';
+      var isWeekly = !isTracker && h.frequency === 'weekly';
+      var accent = h.color || '#CDA34E';
       var weekDots = week.map(function (d) {
         return '<span class="d' + (dates.indexOf(d) !== -1 ? ' done' : '') + '"></span>';
       }).join('');
 
       var indicatorHtml;
-      if (isWeekly) {
+      if (isTracker) {
+        indicatorHtml = '<div class="streak-indicator tracker" title="Total">' +
+          '<span class="dot"></span>' + dates.length + '</div>';
+      } else if (isWeekly) {
         var target = h.frequency_per_week || 1;
         var weekCount = window.ITBOY.streak.completionsThisWeek(dates, today);
         indicatorHtml = '<div class="streak-indicator weekly" title="Cette semaine">' +
@@ -230,16 +242,17 @@
         indicatorHtml = '<div class="streak-indicator"><span class="dot"></span>' + streak + '</div>';
       }
 
-      // Freeze : ne proposer que pour une habitude quotidienne dont hier
-      // n'a pas ete cochee (protege la chaine avant qu'elle ne se casse).
-      var showFreeze = !isWeekly && dates.indexOf(yesterday) === -1;
+      // Freeze : concept de streak a proteger, donc uniquement pour une
+      // habitude quotidienne (pas hebdo, pas un tracker) dont hier n'a
+      // pas ete cochee.
+      var showFreeze = !isTracker && !isWeekly && dates.indexOf(yesterday) === -1;
       var freezeBtn = showFreeze
         ? '<button class="freeze-btn" data-action="freeze" type="button" title="' +
           (canFreeze ? 'Proteger hier (' + (freezeLimit - freezeUsed) + ' jeton' + (freezeLimit - freezeUsed > 1 ? 's' : '') + ' restant)' : 'Plus de jeton ce mois-ci') +
           '"' + (canFreeze ? '' : ' disabled') + '>❄️</button>'
         : '';
 
-      return '<div class="habit-row' + (manual ? ' draggable' : '') + '" data-habit-id="' + h.id + '"' + (manual ? ' draggable="true"' : '') + '>' +
+      return '<div class="habit-row' + (manual ? ' draggable' : '') + '" data-habit-id="' + h.id + '" style="--habit-accent:' + accent + '"' + (manual ? ' draggable="true"' : '') + '>' +
         (manual ? '<span class="drag-handle" aria-hidden="true">⠿</span>' : '') +
         '<button class="habit-checkbox' + (doneToday ? ' done' : '') + '" data-action="toggle" aria-label="Fait aujourd\'hui"></button>' +
         '<div class="info">' +
@@ -457,26 +470,52 @@
     frequencyCountLabel.style.display = frequencySelect.value === 'weekly' ? 'flex' : 'none';
   });
 
+  if (typeSelect && frequencyWrap) {
+    typeSelect.addEventListener('change', function () {
+      var isTracker = typeSelect.value === 'tracker';
+      frequencyWrap.style.display = isTracker ? 'none' : 'flex';
+      if (isTracker) frequencyCountLabel.style.display = 'none';
+    });
+  }
+
+  if (colorPicker && colorInput) {
+    colorPicker.querySelectorAll('.color-swatch').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        colorPicker.querySelectorAll('.color-swatch').forEach(function (b) { b.classList.toggle('active', b === btn); });
+        colorInput.value = btn.getAttribute('data-color');
+      });
+    });
+  }
+
   addForm.addEventListener('submit', async function (e) {
     e.preventDefault();
     bannerZone.innerHTML = '';
     var name = addForm.name.value.trim();
     var category = addForm.category.value;
-    var frequency = addForm.frequency.value;
-    var frequencyPerWeek = frequency === 'weekly' ? parseInt(addForm.frequencyPerWeek.value, 10) : null;
+    var type = typeSelect ? typeSelect.value : 'habit';
+    var isTracker = type === 'tracker';
+    var frequency = isTracker ? 'daily' : addForm.frequency.value;
+    var frequencyPerWeek = (!isTracker && frequency === 'weekly') ? parseInt(addForm.frequencyPerWeek.value, 10) : null;
+    var description = addForm.description ? addForm.description.value.trim() : '';
+    var color = colorInput ? colorInput.value : null;
 
     if (!name) return;
 
     try {
       var wasFirstHabit = habits.length === 0;
       var habit = await window.ITBOY.api.createHabit(user.id, {
-        name: name, category: category, frequency: frequency,
-        frequencyPerWeek: frequencyPerWeek, source: 'custom',
-        position: habits.length + 1
+        name: name, category: category, type: type,
+        description: description || null, color: color,
+        frequency: frequency, frequencyPerWeek: frequencyPerWeek,
+        source: 'custom', position: habits.length + 1
       });
       habits.push(habit);
       logsByHabit[habit.id] = [];
       addForm.reset();
+      if (colorPicker) {
+        colorPicker.querySelectorAll('.color-swatch').forEach(function (b, i) { b.classList.toggle('active', i === 0); });
+      }
+      if (frequencyWrap) frequencyWrap.style.display = 'flex';
       addForm.style.display = 'none';
       renderLimitNote();
       renderHabitList();

@@ -50,7 +50,7 @@
 
   function renderStats(habits, logsByHabit, allDates, today) {
     var totalCheckins = allDates.length;
-    var bestStreak = habits.filter(function (h) { return h.frequency !== 'weekly'; }).reduce(function (max, h) {
+    var bestStreak = habits.filter(function (h) { return h.frequency !== 'weekly' && h.type !== 'tracker'; }).reduce(function (max, h) {
       return Math.max(max, window.ITBOY.streak.computeCurrentStreak(logsByHabit[h.id] || [], today));
     }, 0);
     var avgRate7 = habits.length
@@ -72,11 +72,14 @@
       return (logsByHabit[b.id] || []).length - (logsByHabit[a.id] || []).length;
     }).map(function (h) {
       var dates = logsByHabit[h.id] || [];
-      var isWeekly = h.frequency === 'weekly';
-      var streak = isWeekly
-        ? window.ITBOY.streak.computeWeeklyStreak(dates, h.frequency_per_week || 1, today)
-        : window.ITBOY.streak.computeCurrentStreak(dates, today);
-      var streakLabel = isWeekly ? 'Semaines' : 'Streak';
+      var isTracker = h.type === 'tracker';
+      var isWeekly = !isTracker && h.frequency === 'weekly';
+      var streak = isTracker
+        ? dates.length
+        : (isWeekly
+          ? window.ITBOY.streak.computeWeeklyStreak(dates, h.frequency_per_week || 1, today)
+          : window.ITBOY.streak.computeCurrentStreak(dates, today));
+      var streakLabel = isTracker ? 'Total' : (isWeekly ? 'Semaines' : 'Streak');
       return '<a class="habit-summary-row" href="../habits/?id=' + h.id + '">' +
         '<div class="info">' +
         '<span class="name">' + window.ITBOY.ui.escapeHtml(h.name) + (isWeekly ? ' <span class="link-muted" style="font-size:11px">· ' + (h.frequency_per_week || 1) + 'x/sem.</span>' : '') + '</span>' +

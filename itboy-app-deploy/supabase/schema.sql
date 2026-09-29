@@ -334,3 +334,16 @@ where h.id = sub.id and h.position = 0;
 
 alter table public.habit_logs add column if not exists note text;
 alter table public.habit_logs add column if not exists source text not null default 'checkin' check (source in ('checkin', 'freeze'));
+
+-- ============================================================
+-- 10. Creation d'habitude plus precise (2026-09-29) - type
+--     (habitude classique avec streak vs tracker simple, sans
+--     notion de serie a proteger : pas de freeze, badge = total
+--     de coches au lieu du streak, cf. dashboard.js/habitDetail.js),
+--     description libre, et couleur d'accent personnalisee (accent
+--     de la carte + case a cocher, cf. style.css --habit-accent).
+-- ============================================================
+
+alter table public.habits add column if not exists type text not null default 'habit' check (type in ('habit', 'tracker'));
+alter table public.habits add column if not exists description text;
+alter table public.habits add column if not exists color text;

@@ -328,14 +328,29 @@
 
       nameEl.textContent = habit.name;
       categoryEl.textContent = window.ITBOY.CATEGORY_LABELS[habit.category] || habit.category;
+      if (habit.description) {
+        var descEl = document.createElement('p');
+        descEl.className = 'plan-note';
+        descEl.style.maxWidth = '520px';
+        descEl.style.marginTop = '4px';
+        descEl.textContent = habit.description;
+        categoryEl.insertAdjacentElement('afterend', descEl);
+      }
 
       // Le streak/taux se calcule TOUJOURS sur l'historique complet, même en
       // Free : la limite d'affichage ne doit jamais fausser un vrai streak
       // de plus de 30 jours (voir note dans plans.js).
       var rate30 = window.ITBOY.streak.completionRate(dates, 30, today);
-      var isWeekly = habit.frequency === 'weekly';
+      var isTracker = habit.type === 'tracker';
+      var isWeekly = !isTracker && habit.frequency === 'weekly';
 
-      if (isWeekly) {
+      if (isTracker) {
+        var thisMonthCount = dates.filter(function (d) { return d.slice(0, 7) === today.slice(0, 7); }).length;
+        statsEl.innerHTML =
+          statTile(dates.length, 'Total') +
+          statTile(thisMonthCount, 'Ce mois-ci') +
+          statTile(rate30 + '%', 'Sur 30 jours');
+      } else if (isWeekly) {
         var target = habit.frequency_per_week || 1;
         var weekCount = window.ITBOY.streak.completionsThisWeek(dates, today);
         var weeklyStreak = window.ITBOY.streak.computeWeeklyStreak(dates, target, today);
