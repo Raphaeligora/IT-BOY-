@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<script>document.documentElement.classList.add('js-reveal');</script>
 <link rel="icon" href="/favicon.ico" sizes="any" />
 <link rel="icon" href="/assets/icons/icon-192.png" type="image/png" />
 <link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png" />
@@ -92,6 +93,14 @@
           </div>
           <div class="streak">21</div>
         </div>
+        <div class="mockup-row" style="--mockup-accent:#7FB3D5">
+          <div class="mockup-dot done"></div>
+          <div class="info">
+            <span class="name">Hydratation</span>
+            <div class="mini-week"><span class="done"></span><span class="done"></span><span></span><span class="done"></span><span class="done"></span><span class="done"></span><span class="done"></span></div>
+          </div>
+          <div class="streak">8</div>
+        </div>
       </div>
     </div>
 
@@ -126,6 +135,43 @@
   </div>
 </section>
 
+<!-- ============ HABITUDE VS TRACKER ============ -->
+<section style="padding:96px 22px 0;display:flex;flex-direction:column;align-items:center">
+  <h2 class="font-cinzel reveal" style="font-weight:500;font-size:clamp(24px,6.5vw,34px);line-height:1.3;text-align:center;margin:0 0 8px;max-width:22ch">Habitude ou tracker : à toi de choisir</h2>
+  <p class="reveal" style="--d:1;font-size:15px;color:#8A8A8A;margin:0 0 48px;text-align:center;max-width:38ch">Le même tableau de bord, deux façons de suivre ce qui compte pour toi.</p>
+
+  <div style="width:100%;max-width:640px;display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:24px">
+    <div class="reveal" style="--d:0">
+      <div class="habit-row" style="--habit-accent:#CDA34E;pointer-events:none">
+        <button class="habit-checkbox done" tabindex="-1" aria-hidden="true"></button>
+        <div class="info">
+          <span class="name">Lecture — 20 min</span>
+          <span class="category">Mindset &amp; discipline</span>
+          <div class="mini-week" aria-hidden="true"><span class="d done"></span><span class="d done"></span><span class="d done"></span><span class="d done"></span><span class="d done"></span><span class="d"></span><span class="d done"></span></div>
+        </div>
+        <div class="streak-indicator"><span class="dot"></span>12</div>
+        <a class="detail-link" tabindex="-1" aria-hidden="true">Detail</a>
+        <button class="archive-btn" tabindex="-1" aria-hidden="true">Archiver</button>
+      </div>
+      <p style="text-align:center;margin-top:18px;font-size:13px;line-height:1.6;color:#8A8A8A">Habitude — une série à tenir chaque jour, ou X fois par semaine.</p>
+    </div>
+    <div class="reveal" style="--d:1">
+      <div class="habit-row" style="--habit-accent:#7FB3D5;pointer-events:none">
+        <button class="habit-checkbox" tabindex="-1" aria-hidden="true"></button>
+        <div class="info">
+          <span class="name">Verres d'eau</span>
+          <span class="category">Santé</span>
+          <div class="mini-week" aria-hidden="true"><span class="d done"></span><span class="d"></span><span class="d done"></span><span class="d done"></span><span class="d"></span><span class="d done"></span><span class="d done"></span></div>
+        </div>
+        <div class="streak-indicator tracker"><span class="dot"></span>18</div>
+        <a class="detail-link" tabindex="-1" aria-hidden="true">Detail</a>
+        <button class="archive-btn" tabindex="-1" aria-hidden="true">Archiver</button>
+      </div>
+      <p style="text-align:center;margin-top:18px;font-size:13px;line-height:1.6;color:#8A8A8A">Tracker — un suivi simple, sans série à casser.</p>
+    </div>
+  </div>
+</section>
+
 <!-- ============ BANDEAU CATÉGORIES ============ -->
 <section style="padding:88px 0 0">
   <div class="chip-marquee">
@@ -140,19 +186,19 @@
 <section style="padding:112px 22px 0;display:flex;flex-direction:column;align-items:center">
   <h2 class="font-cinzel" style="font-weight:500;font-size:clamp(24px,6.5vw,34px);line-height:1.3;text-align:center;margin:0 0 48px;max-width:18ch">Ça te parle ?</h2>
   <div class="why-grid">
-    <div class="why-row">
+    <div class="why-row reveal" style="--d:0">
       <div class="num">01</div>
       <div><p class="title" style="font-family:'Cinzel',serif">Un jour manqué — la série est cassée, la motivation avec.</p></div>
     </div>
-    <div class="why-row">
+    <div class="why-row reveal" style="--d:1">
       <div class="num">02</div>
       <div><p class="title" style="font-family:'Cinzel',serif">Tu ne sais jamais si tu progresses vraiment, ou si tu tournes en rond.</p></div>
     </div>
-    <div class="why-row">
+    <div class="why-row reveal" style="--d:2">
       <div class="num">03</div>
       <div><p class="title" style="font-family:'Cinzel',serif">Des apps chargées de fonctions inutiles, pour un prix élevé.</p></div>
     </div>
-    <div class="why-row">
+    <div class="why-row reveal" style="--d:3">
       <div class="num">04</div>
       <div><p class="title" style="font-family:'Cinzel',serif">Tu notes tes objectifs dans un carnet, puis tu oublies de les relire.</p></div>
     </div>
@@ -168,65 +214,65 @@
   </div>
 
   <div class="feature-grid">
-    <div class="feature-card">
-      <div class="mark"></div>
+    <div class="feature-card reveal" style="--d:0">
+      <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="8" width="20" height="8" rx="4"/><circle cx="16" cy="12" r="2.6" fill="currentColor" stroke="none"/></svg></div>
       <div class="title">Free &amp; Premium</div>
       <div class="desc">Commence gratuitement, passe à l'échelle quand tu es prêt. Aucune fonctionnalité cachée.</div>
     </div>
-    <div class="feature-card">
-      <div class="mark"></div>
+    <div class="feature-card reveal" style="--d:1">
+      <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="12" r="6.5"/><circle cx="15" cy="12" r="6.5"/></svg></div>
       <div class="title">Habitude ou tracker</div>
       <div class="desc">Une habitude avec streak à tenir, ou un tracker simple sans pression. À toi de choisir le format adapté à chaque objectif.</div>
     </div>
-    <div class="feature-card">
-      <div class="mark"></div>
+    <div class="feature-card reveal" style="--d:2">
+      <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18"/><path d="M8 3v4M16 3v4"/></svg></div>
       <div class="title">Fréquence sur mesure</div>
       <div class="desc">Quotidienne, ou X fois par semaine — le streak s'adapte automatiquement à ton rythme.</div>
     </div>
-    <div class="feature-card">
-      <div class="mark"></div>
+    <div class="feature-card reveal" style="--d:3">
+      <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M4.5 6.5l15 11M19.5 6.5l-15 11"/></svg></div>
       <div class="title">Freeze de série</div>
       <div class="desc">Un jour manqué ne doit pas tout casser. Des jetons de protection chaque mois, plus nombreux en Premium.</div>
     </div>
-    <div class="feature-card">
-      <div class="mark"></div>
+    <div class="feature-card reveal" style="--d:4">
+      <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3h11l3 3v15H5Z"/><path d="M8 10h8M8 14h8M8 18h5"/></svg></div>
       <div class="title">Notes par coche</div>
       <div class="desc">Garde une trace de ce qui a compté ce jour-là, directement sur chaque habitude.</div>
     </div>
-    <div class="feature-card">
-      <div class="mark"></div>
+    <div class="feature-card reveal" style="--d:5">
+      <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 1 0 0 18c1.3 0 2-.8 2-1.9 0-.5-.2-.9-.5-1.2-.3-.3-.5-.7-.5-1.2 0-1 .8-1.8 1.8-1.8H17a4 4 0 0 0 4-4c0-5-4-7.9-9-7.9Z"/><circle cx="7.5" cy="10.8" r="1.1" fill="currentColor" stroke="none"/><circle cx="12" cy="7.8" r="1.1" fill="currentColor" stroke="none"/><circle cx="16.3" cy="10.8" r="1.1" fill="currentColor" stroke="none"/></svg></div>
       <div class="title">Couleur &amp; description</div>
       <div class="desc">Personnalise chaque carte pour la reconnaître en un clin d'œil sur ton tableau de bord.</div>
     </div>
-    <div class="feature-card">
-      <div class="mark"></div>
+    <div class="feature-card reveal" style="--d:0">
+      <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V11M12 20V4M20 20v-8"/></svg></div>
       <div class="title">Statistiques détaillées</div>
       <div class="desc">Taux de complétion, tendances, meilleurs jours.</div>
       <span class="badge">Premium</span>
     </div>
-    <div class="feature-card">
-      <div class="mark"></div>
+    <div class="feature-card reveal" style="--d:1">
+      <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M8 9a3.5 3.5 0 1 0 0 7c2.5 0 3.5-2 5-3.5S16.5 9 19 9a3.5 3.5 0 1 1 0 7c-2.5 0-3.5-2-5-3.5S11.5 9 8 9Z"/></svg></div>
       <div class="title">Habitudes illimitées</div>
       <div class="desc">Suis autant d'habitudes que tu veux, sans plafond.</div>
       <span class="badge">Premium</span>
     </div>
-    <div class="feature-card">
-      <div class="mark"></div>
+    <div class="feature-card reveal" style="--d:2">
+      <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="4.5" height="4.5" rx="1"/><rect x="10" y="3" width="4.5" height="4.5" rx="1"/><rect x="17" y="3" width="4" height="4.5" rx="1"/><rect x="3" y="10" width="4.5" height="4.5" rx="1"/><rect x="10" y="10" width="4.5" height="4.5" rx="1" fill="currentColor" stroke="none"/><rect x="17" y="10" width="4" height="4.5" rx="1"/><rect x="3" y="17" width="4.5" height="4" rx="1"/><rect x="10" y="17" width="4.5" height="4" rx="1" fill="currentColor" stroke="none"/><rect x="17" y="17" width="4" height="4" rx="1" fill="currentColor" stroke="none"/></svg></div>
       <div class="title">Historique visuel</div>
       <div class="desc">Un calendrier qui montre ta régularité en un coup d'œil.</div>
     </div>
-    <div class="feature-card">
-      <div class="mark"></div>
+    <div class="feature-card reveal" style="--d:3">
+      <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 10l5 5 5-5"/><path d="M4 19h16"/></svg></div>
       <div class="title">Export CSV</div>
       <div class="desc">Récupère toutes tes données en un clic, à tout moment, depuis ton tableau de bord.</div>
     </div>
-    <div class="feature-card">
-      <div class="mark"></div>
+    <div class="feature-card reveal" style="--d:4">
+      <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="14" height="11" rx="1.2"/><path d="M2 15h14"/><rect x="17.5" y="4" width="4.5" height="15" rx="1"/></svg></div>
       <div class="title">Multi-appareils</div>
       <div class="desc">Installable comme une app, synchronisé partout.</div>
     </div>
-    <div class="feature-card">
-      <div class="mark"></div>
+    <div class="feature-card reveal" style="--d:5">
+      <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3h6a2 2 0 0 1 2 2v6l-9 9-8-8 9-9Z"/><circle cx="15" cy="8" r="1.2" fill="currentColor" stroke="none"/></svg></div>
       <div class="title">Prix clair</div>
       <div class="desc">0€ pour commencer, 4,99€/mois pour aller plus loin. Rien de caché.</div>
     </div>
@@ -240,7 +286,7 @@
 
   <div style="width:100%;max-width:560px;display:flex;flex-direction:column;gap:0">
 
-    <div style="display:flex;flex-direction:column;gap:14px;padding:38px 0">
+    <div class="reveal" style="--d:0;display:flex;flex-direction:column;gap:14px;padding:38px 0">
       <div style="display:flex;align-items:center;gap:14px">
         <div style="width:34px;height:1px;background:#CDA34E"></div>
         <span class="font-cinzel" style="font-size:13px;letter-spacing:0.3em;color:#CDA34E">01</span>
@@ -251,7 +297,7 @@
 
     <div style="height:1px;background:linear-gradient(90deg,rgba(205,163,78,0.45),rgba(205,163,78,0))"></div>
 
-    <div style="display:flex;flex-direction:column;gap:14px;padding:38px 0">
+    <div class="reveal" style="--d:1;display:flex;flex-direction:column;gap:14px;padding:38px 0">
       <div style="display:flex;align-items:center;gap:12px">
         <svg viewBox="0 0 24 24" aria-hidden="true" style="width:16px;height:16px;flex:none">
           <path d="M12 1 L13.6 10.4 L23 12 L13.6 13.6 L12 23 L10.4 13.6 L1 12 L10.4 10.4 Z" fill="#CDA34E" />
@@ -264,7 +310,7 @@
 
     <div style="height:1px;background:linear-gradient(90deg,rgba(205,163,78,0.45),rgba(205,163,78,0))"></div>
 
-    <div style="display:flex;flex-direction:column;gap:14px;padding:38px 0">
+    <div class="reveal" style="--d:2;display:flex;flex-direction:column;gap:14px;padding:38px 0">
       <div style="display:flex;align-items:center;gap:12px">
         <svg viewBox="0 0 24 24" aria-hidden="true" style="width:17px;height:17px;flex:none">
           <circle cx="12" cy="12" r="10.5" fill="none" stroke="#CDA34E" stroke-width="1.4" stroke-dasharray="52 14" stroke-linecap="round" transform="rotate(-70 12 12)" />
@@ -290,28 +336,28 @@
   <h2 class="font-cinzel" style="font-weight:500;font-size:clamp(24px,6.5vw,34px);line-height:1.3;text-align:center;margin:0 0 8px;max-width:22ch">Pourquoi IT BOY</h2>
   <p style="font-size:15px;color:#8A8A8A;margin:0 0 48px;text-align:center">Pensé pour ceux qui veulent comprendre leur propre progression</p>
   <div class="why-grid">
-    <div class="why-row">
+    <div class="why-row reveal" style="--d:0">
       <div class="num">—</div>
       <div>
         <p class="title">Une seule app, pensée pour durer</p>
         <p class="desc">Pas dix outils différents pour dix habitudes. Un seul endroit, clair et net.</p>
       </div>
     </div>
-    <div class="why-row">
+    <div class="why-row reveal" style="--d:1">
       <div class="num">—</div>
       <div>
         <p class="title">Tes données t'appartiennent</p>
         <p class="desc">Rien n'est revendu à des annonceurs. Ta progression, c'est ton affaire.</p>
       </div>
     </div>
-    <div class="why-row">
+    <div class="why-row reveal" style="--d:2">
       <div class="num">—</div>
       <div>
         <p class="title">Simple par conception</p>
         <p class="desc">Aucune fonctionnalité superflue, aucun menu confus.</p>
       </div>
     </div>
-    <div class="why-row">
+    <div class="why-row reveal" style="--d:3">
       <div class="num">—</div>
       <div>
         <p class="title">Rapide et fiable</p>
@@ -431,6 +477,27 @@
         window.ITBOY.track('landing_cta_click', { cta: el.className });
       });
     });
+  }
+
+  // Micro-animations au scroll : simple apparition + léger décalage, voir
+  // .reveal / .in-view dans style.css. Amélioration progressive — la classe
+  // js-reveal (posée dans <head>) est ce qui rend .reveal invisible avant
+  // apparition, donc sans JS (ou sans IntersectionObserver) rien n'est caché.
+  var revealEls = document.querySelectorAll('.reveal');
+  if (revealEls.length) {
+    if ('IntersectionObserver' in window) {
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('in-view');
+            io.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+      revealEls.forEach(function (el) { io.observe(el); });
+    } else {
+      revealEls.forEach(function (el) { el.classList.add('in-view'); });
+    }
   }
 })();
 </script>

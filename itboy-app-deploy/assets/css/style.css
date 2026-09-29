@@ -1371,16 +1371,25 @@ button.action-chip:disabled { opacity: 0.5; cursor: not-allowed; transform: none
 .mockup-dot {
   width: 20px; height: 20px;
   border-radius: 50%;
-  border: 1.5px solid rgba(205,163,78,0.5);
+  border: 1.5px solid var(--mockup-accent, rgba(205,163,78,0.5));
   flex: none;
 }
-.mockup-dot.done { background: var(--gold); border-color: var(--gold); }
+.mockup-dot.done { background: var(--mockup-accent, var(--gold)); border-color: var(--mockup-accent, var(--gold)); }
 .mockup-row .info { flex: 1; display: flex; flex-direction: column; gap: 5px; min-width: 0; }
 .mockup-row .name { font-size: 13px; color: var(--white); }
 .mockup-row .mini-week { display: flex; gap: 4px; }
 .mockup-row .mini-week span { width: 6px; height: 6px; border-radius: 50%; background: rgba(246,246,246,0.12); }
-.mockup-row .mini-week span.done { background: var(--gold); }
-.mockup-row .streak { display: flex; align-items: center; gap: 5px; font-size: 12px; color: var(--gold); white-space: nowrap; }
+.mockup-row .mini-week span.done { background: var(--mockup-accent, var(--gold)); }
+.mockup-row .streak { display: flex; align-items: center; gap: 5px; font-size: 12px; color: var(--mockup-accent, var(--gold)); white-space: nowrap; }
+.mockup-row .streak.tracker-tag {
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  background: color-mix(in srgb, var(--mockup-accent, var(--gold)) 14%, transparent);
+  border: 1px solid color-mix(in srgb, var(--mockup-accent, var(--gold)) 30%, transparent);
+  border-radius: 999px;
+  padding: 3px 8px;
+}
 
 /* ---- Landing : grille de fonctionnalités ---- */
 .feature-grid {
@@ -1399,6 +1408,8 @@ button.action-chip:disabled { opacity: 0.5; cursor: not-allowed; transform: none
   gap: 10px;
 }
 .feature-card .mark { width: 22px; height: 1px; background: var(--gold); }
+.feature-card .icon { width: 24px; height: 24px; color: var(--gold); flex: none; }
+.feature-card .icon svg { width: 100%; height: 100%; display: block; }
 .feature-card .title { font-family: 'Cinzel', serif; font-size: 16px; letter-spacing: 0.02em; color: var(--white); }
 .feature-card .desc { font-size: 13.5px; line-height: 1.6; color: var(--grey); }
 .feature-card .badge {
@@ -1569,6 +1580,23 @@ button.action-chip:disabled { opacity: 0.5; cursor: not-allowed; transform: none
   font-size: 12.5px;
   color: var(--grey);
   white-space: nowrap;
+}
+
+/* ---- Landing : apparition au scroll ----
+   .reveal part masque/decale puis reprend sa place quand il entre dans
+   le viewport (classe .in-view ajoutee par un IntersectionObserver, voir
+   index.html). --d (0-5) donne un leger decalage pour un effet de
+   cascade dans les grilles. Scope sous html.js-reveal (ajoutee par un
+   script inline tout en haut du body) : si JS est desactive, .reveal ne
+   passe jamais en opacity:0 et le contenu reste visible par defaut. */
+@media (prefers-reduced-motion: no-preference) {
+  html.js-reveal .reveal {
+    opacity: 0;
+    transform: translateY(16px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+    transition-delay: calc(var(--d, 0) * 70ms);
+  }
+  html.js-reveal .reveal.in-view { opacity: 1; transform: translateY(0); }
 }
 
 /* ---- Landing : preview secondaire (stats) ---- */
