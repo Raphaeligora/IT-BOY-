@@ -1080,6 +1080,53 @@ button.action-chip:disabled { opacity: 0.5; cursor: not-allowed; transform: none
   background: linear-gradient(90deg, rgba(205,163,78,0.6), var(--gold));
 }
 
+/* Modale "Installer l'app" (PWA), lancee depuis le bouton pwa-install-btn
+   de la landing (voir index.html). */
+.pwa-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: rgba(6,11,20,0.72);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.pwa-modal {
+  position: relative;
+  width: 100%;
+  max-width: 420px;
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
+  background: linear-gradient(155deg, var(--bg-card-2) 0%, var(--bg-card) 55%, #0D1727 100%);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 50px 100px -35px rgba(0,0,0,0.85);
+  padding: 30px 26px 26px;
+}
+.pwa-modal h3 { font-size: 20px; font-weight: 600; color: var(--white); margin: 0; padding-right: 24px; }
+.pwa-modal-intro { font-size: 13.5px; line-height: 1.6; color: var(--grey); margin: 10px 0 22px; }
+.pwa-modal-close {
+  position: absolute;
+  top: 18px;
+  right: 20px;
+  background: none;
+  border: none;
+  color: var(--grey);
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 4px;
+  transition: color 0.15s;
+}
+.pwa-modal-close:hover { color: var(--white); }
+.pwa-modal-platform { padding: 16px 0; border-top: 1px solid var(--line); }
+.pwa-modal-platform:first-of-type { border-top: none; padding-top: 0; }
+.pwa-modal-platform-name { font-family: 'Cinzel', serif; font-size: 13.5px; color: var(--gold); margin-bottom: 8px; }
+.pwa-modal-platform ol { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 4px; }
+.pwa-modal-platform li { font-size: 13px; line-height: 1.55; color: var(--white); }
+
 .locked-card {
   width: 100%;
   background: linear-gradient(155deg, rgba(205,163,78,0.05), transparent 60%);

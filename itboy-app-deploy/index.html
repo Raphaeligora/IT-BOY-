@@ -45,10 +45,48 @@
 
   <p style="position:relative;font-size:16px;line-height:1.65;color:#8A8A8A;text-align:center;margin:22px 0 0;max-width:38ch;text-wrap:pretty">Un calendrier visuel pour chaque habitude qui compte. Suivi quotidien, séries, statistiques — sur tous tes appareils.</p>
 
-  <a href="signup/" class="cta-btn hero-signup-cta" style="position:relative;margin-top:40px" data-track="landing_cta_click" data-track-meta='{"cta":"hero_signup"}'>Commencer</a>
+  <div style="position:relative;margin-top:40px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;justify-content:center">
+    <a href="signup/" class="cta-btn hero-signup-cta" data-track="landing_cta_click" data-track-meta='{"cta":"hero_signup"}'>Commencer</a>
+    <button type="button" class="cta-btn ghost" id="pwa-install-btn" data-track="landing_cta_click" data-track-meta='{"cta":"pwa_install"}'>Installer l'app</button>
+  </div>
 
   <p style="position:relative;margin-top:18px;font-size:12px;letter-spacing:0.04em;color:#8A8A8A">Devenir sa meilleure version · <a href="#fonctionnalites" class="link-muted" style="color:#CDA34E" data-track="nav_click" data-track-meta='{"target":"fonctionnalites_hero"}'>voir les fonctionnalités</a></p>
 </section>
+
+<!-- ============ MODALE : installer l'app (PWA) ============ -->
+<div class="pwa-modal-overlay" id="pwa-install-modal" hidden>
+  <div class="pwa-modal" role="dialog" aria-modal="true" aria-labelledby="pwa-modal-title">
+    <button type="button" class="pwa-modal-close" id="pwa-modal-close" aria-label="Fermer">&times;</button>
+    <h3 id="pwa-modal-title" class="font-cinzel">Installer IT BOY</h3>
+    <p class="pwa-modal-intro">Installe l'application sur ton appareil pour un accès plus rapide et une meilleure expérience.</p>
+
+    <div class="pwa-modal-platform">
+      <div class="pwa-modal-platform-name">iPhone / iPad (Safari)</div>
+      <ol>
+        <li>Appuie sur l'icône Partager (carré avec flèche) en bas de l'écran</li>
+        <li>Fais défiler et appuie sur « Sur l'écran d'accueil »</li>
+      </ol>
+    </div>
+
+    <div class="pwa-modal-platform">
+      <div class="pwa-modal-platform-name">Android (Chrome)</div>
+      <ol>
+        <li>Appuie sur le menu (⋮) en haut à droite</li>
+        <li>Appuie sur « Installer l'application » ou « Ajouter à l'écran d'accueil »</li>
+      </ol>
+    </div>
+
+    <div class="pwa-modal-platform">
+      <div class="pwa-modal-platform-name">Ordinateur (Chrome / Edge)</div>
+      <ol>
+        <li>Clique sur l'icône d'installation dans la barre d'adresse</li>
+        <li>Clique sur « Installer » dans la fenêtre qui s'ouvre</li>
+      </ol>
+    </div>
+
+    <button type="button" class="cta-btn" id="pwa-modal-ok" style="width:100%;margin-top:6px">Compris</button>
+  </div>
+</div>
 
 <!-- ============ APERÇU PRODUIT (fenêtre app + onglets auto-play) ============ -->
 <section style="padding:88px 22px 0;display:flex;flex-direction:column;align-items:center">
@@ -499,6 +537,68 @@
       revealEls.forEach(function (el) { el.classList.add('in-view'); });
     }
   }
+
+  // ---- Installer l'app (PWA) -----------------------------------------
+  // Bouton "Installer l'app" a cote du CTA hero : declenche le prompt
+  // natif du navigateur quand il est disponible (beforeinstallprompt,
+  // Chrome/Edge desktop et Android), sinon affiche une modale d'aide
+  // avec les etapes par plateforme (iOS Safari n'expose jamais cet
+  // evenement, il faut donc toujours prevoir ce fallback manuel).
+  var installBtn = document.getElementById('pwa-install-btn');
+  var installModal = document.getElementById('pwa-install-modal');
+  var installModalClose = document.getElementById('pwa-modal-close');
+  var installModalOk = document.getElementById('pwa-modal-ok');
+  var deferredInstallPrompt = null;
+
+  function isStandaloneApp() {
+    return (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) ||
+      window.navigator.standalone === true;
+  }
+
+  if (installBtn && isStandaloneApp()) {
+    installBtn.style.display = 'none';
+  }
+
+  window.addEventListener('beforeinstallprompt', function (e) {
+    e.preventDefault();
+    deferredInstallPrompt = e;
+  });
+
+  function openInstallModal() {
+    if (!installModal) return;
+    installModal.hidden = false;
+    document.body.style.overflow = 'hidden';
+  }
+  function closeInstallModal() {
+    if (!installModal) return;
+    installModal.hidden = true;
+    document.body.style.overflow = '';
+  }
+
+  if (installBtn) {
+    installBtn.addEventListener('click', function () {
+      if (deferredInstallPrompt) {
+        deferredInstallPrompt.prompt();
+        deferredInstallPrompt.userChoice.then(function (choice) {
+          deferredInstallPrompt = null;
+          if (choice && choice.outcome === 'accepted' && installBtn) installBtn.style.display = 'none';
+        });
+      } else {
+        openInstallModal();
+      }
+    });
+  }
+  if (installModalClose) installModalClose.addEventListener('click', closeInstallModal);
+  if (installModalOk) installModalOk.addEventListener('click', closeInstallModal);
+  if (installModal) {
+    installModal.addEventListener('click', function (e) { if (e.target === installModal) closeInstallModal(); });
+  }
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && installModal && !installModal.hidden) closeInstallModal();
+  });
+  window.addEventListener('appinstalled', function () {
+    if (installBtn) installBtn.style.display = 'none';
+  });
 })();
 </script>
 </body>
