@@ -643,7 +643,7 @@ button.action-chip:disabled { opacity: 0.5; cursor: not-allowed; transform: none
   max-width: 640px;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  align-items: start;
+  align-items: stretch;
   gap: 16px;
   margin-bottom: 32px;
 }
@@ -652,6 +652,7 @@ button.action-chip:disabled { opacity: 0.5; cursor: not-allowed; transform: none
   display: grid;
   grid-template-columns: auto auto 1fr auto auto;
   align-items: center;
+  align-content: center;
   column-gap: 12px;
   row-gap: 10px;
   background: linear-gradient(155deg, var(--bg-card-2) 0%, var(--bg-card) 55%, #0D1727 100%);
@@ -662,6 +663,17 @@ button.action-chip:disabled { opacity: 0.5; cursor: not-allowed; transform: none
   position: relative;
   overflow: hidden;
   transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+/* Toutes les cartes du dashboard partagent la meme taille (meme avec un
+   nom d'habitude plus long ou moins de boutons affiches) : hauteur mini
+   fixe + nom limite a 2 lignes, .habit-list en stretch pour que chaque
+   carte occupe toute la hauteur de sa ligne de grille. */
+.habit-row:has(.habit-checkbox) { min-height: 176px; }
+.habit-row .info .name {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 /* Grille interne par grid-area/colonne plutot que par flex-basis, pour
    eviter qu'un element seul sur sa ligne ne s'etire a 100% de large.
@@ -686,7 +698,7 @@ button.action-chip:disabled { opacity: 0.5; cursor: not-allowed; transform: none
   left: 0; top: 12px; bottom: 12px;
   width: 3px;
   border-radius: 0 3px 3px 0;
-  background: linear-gradient(180deg, var(--gold-bright), var(--gold));
+  background: var(--habit-accent, linear-gradient(180deg, var(--gold-bright), var(--gold)));
   opacity: 0;
   transition: opacity 0.2s ease;
 }
@@ -715,8 +727,8 @@ button.action-chip:disabled { opacity: 0.5; cursor: not-allowed; transform: none
 }
 .habit-checkbox:hover { border-color: var(--gold); transform: scale(1.06); }
 .habit-checkbox.done {
-  background: linear-gradient(135deg, var(--gold-bright), var(--gold));
-  border-color: var(--gold);
+  background: var(--habit-accent, linear-gradient(135deg, var(--gold-bright), var(--gold)));
+  border-color: var(--habit-accent, var(--gold));
   box-shadow: 0 0 0 4px rgba(205,163,78,0.14), 0 4px 14px -4px rgba(205,163,78,0.7);
 }
 .habit-checkbox.done::after {
@@ -772,6 +784,26 @@ button.action-chip:disabled { opacity: 0.5; cursor: not-allowed; transform: none
   border-color: rgba(127,179,213,0.28);
 }
 .streak-indicator.weekly .dot { background: #8FC1E3; box-shadow: 0 0 6px rgba(127,179,213,0.7); }
+
+.streak-indicator.tracker {
+  color: var(--habit-accent, var(--gold));
+  border-color: var(--habit-accent, rgba(205,163,78,0.25));
+}
+.streak-indicator.tracker .dot { background: var(--habit-accent, var(--gold)); box-shadow: 0 0 6px rgba(205,163,78,0.7); }
+
+/* Selecteur de couleur du formulaire d'ajout d'habitude/tracker. */
+.color-picker { display: flex; flex-wrap: wrap; gap: 10px; padding-top: 4px; }
+.color-swatch {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  padding: 0;
+  cursor: pointer;
+  transition: transform 0.15s ease, border-color 0.15s ease;
+}
+.color-swatch:hover { transform: scale(1.1); }
+.color-swatch.active { border-color: var(--white); box-shadow: 0 0 0 2px rgba(246,246,246,0.15); }
 
 .habit-row .freeze-btn {
   background: none;
