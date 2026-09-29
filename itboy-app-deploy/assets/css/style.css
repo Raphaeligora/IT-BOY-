@@ -634,28 +634,45 @@ button.action-chip:disabled { opacity: 0.5; cursor: not-allowed; transform: none
   margin-bottom: 20px;
 }
 
+/* Grille de cartes (au lieu d'une liste empilee) — chaque habitude est
+   une carte autonome ; .habit-row passe en flex-wrap (voir plus bas)
+   pour reorganiser son contenu sur 2 lignes internes sans toucher au
+   HTML/JS (ordre des enfants pilote par `order`). */
 .habit-list {
   width: 100%;
   max-width: 640px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  align-items: start;
+  gap: 16px;
   margin-bottom: 32px;
 }
 
 .habit-row {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 16px;
+  gap: 12px 16px;
   background: linear-gradient(155deg, var(--bg-card-2) 0%, var(--bg-card) 55%, #0D1727 100%);
   border: 1px solid var(--line);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-card);
-  padding: 16px 18px;
+  padding: 22px;
   position: relative;
   overflow: hidden;
   transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
 }
+/* Ordre d'affichage a l'interieur de la carte : ligne 1 = poignee +
+   case + infos + bouton archiver/reactiver ; ligne 2 (forcee par le
+   flex-basis:100% sur .streak-indicator) = streak + freeze + detail. */
+.habit-row .drag-handle { order: 1; }
+.habit-row .habit-checkbox { order: 2; }
+.habit-row .info { order: 3; flex: 1 1 auto; min-width: 0; }
+.habit-row .archive-btn,
+.habit-row .reactivate-btn { order: 4; margin-left: auto; }
+.habit-row .streak-indicator { order: 5; flex-basis: 100%; }
+.habit-row .freeze-btn { order: 6; }
+.habit-row a.detail-link { order: 7; margin-left: auto; }
 .habit-row::before {
   content: '';
   position: absolute;
