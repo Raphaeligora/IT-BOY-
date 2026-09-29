@@ -649,10 +649,11 @@ button.action-chip:disabled { opacity: 0.5; cursor: not-allowed; transform: none
 }
 
 .habit-row {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: auto 1fr auto auto;
   align-items: center;
-  gap: 12px 16px;
+  column-gap: 12px;
+  row-gap: 10px;
   background: linear-gradient(155deg, var(--bg-card-2) 0%, var(--bg-card) 55%, #0D1727 100%);
   border: 1px solid var(--line);
   border-radius: var(--radius-md);
@@ -662,17 +663,22 @@ button.action-chip:disabled { opacity: 0.5; cursor: not-allowed; transform: none
   overflow: hidden;
   transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
 }
-/* Ordre d'affichage a l'interieur de la carte : ligne 1 = poignee +
-   case + infos + bouton archiver/reactiver ; ligne 2 (forcee par le
-   flex-basis:100% sur .streak-indicator) = streak + freeze + detail. */
-.habit-row .drag-handle { order: 1; }
-.habit-row .habit-checkbox { order: 2; }
-.habit-row .info { order: 3; flex: 1 1 auto; min-width: 0; }
-.habit-row .archive-btn,
-.habit-row .reactivate-btn { order: 4; margin-left: auto; }
-.habit-row .streak-indicator { order: 5; flex-basis: 100%; }
-.habit-row .freeze-btn { order: 6; }
-.habit-row a.detail-link { order: 7; margin-left: auto; }
+/* Grille interne par grid-area/colonne plutot que par flex-basis, pour
+   eviter qu'un element seul sur sa ligne ne s'etire a 100% de large.
+   Cas par defaut (page archivee : juste .info + .reactivate-btn, une
+   seule ligne) : */
+.habit-row .info { grid-column: 1 / span 3; grid-row: 1; min-width: 0; }
+.habit-row .reactivate-btn { grid-column: 4; grid-row: 1; justify-self: end; }
+/* Cas dashboard (case a cocher presente) : ligne 1 = poignee + case +
+   infos + archiver ; ligne 2 = streak + freeze + detail, chacun dans
+   sa propre colonne (pas d'etirement force). */
+.habit-row:has(.habit-checkbox) .drag-handle,
+.habit-row:has(.habit-checkbox) .habit-checkbox { grid-column: 1; grid-row: 1; }
+.habit-row:has(.habit-checkbox) .info { grid-column: 2 / span 2; grid-row: 1; }
+.habit-row:has(.habit-checkbox) .archive-btn { grid-column: 4; grid-row: 1; justify-self: end; }
+.habit-row:has(.habit-checkbox) .streak-indicator { grid-column: 1 / span 2; grid-row: 2; justify-self: start; }
+.habit-row:has(.habit-checkbox) .freeze-btn { grid-column: 3; grid-row: 2; justify-self: center; }
+.habit-row:has(.habit-checkbox) a.detail-link { grid-column: 4; grid-row: 2; justify-self: end; }
 .habit-row::before {
   content: '';
   position: absolute;
