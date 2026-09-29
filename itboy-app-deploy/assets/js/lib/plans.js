@@ -22,7 +22,7 @@
       name: 'Free',
       price: '0€/mois',
       limit: 3,
-      features: ['3 habitudes suivies', 'Historique 30 jours'],
+      features: ['3 habitudes suivies', 'Historique 30 jours', '1 freeze de série par mois'],
       cta: 'Continuer avec Free'
     },
     {
@@ -30,7 +30,7 @@
       name: 'Premium',
       price: '4,99€/mois',
       limit: PLAN_LIMITS.premium,
-      features: ['Habitudes illimitées', 'Historique complet', 'Statistiques détaillées'],
+      features: ['Habitudes illimitées', 'Historique complet', 'Statistiques détaillées', '4 freezes de série par mois'],
       cta: 'Choisir Premium',
       highlighted: true
     }
