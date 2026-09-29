@@ -59,6 +59,8 @@
     <button class="tab-btn" data-tab="stats" role="tab" aria-selected="false">Statistiques</button>
   </div>
 
+  <p class="tab-caption" aria-live="polite">Coche tes habitudes du jour, ta série se construit toute seule.</p>
+
   <div style="width:100%;max-width:420px">
 
     <div class="tab-panel active" data-panel="today">
@@ -456,18 +458,74 @@
 <script src="./assets/js/lib/track.js"></script>
 <script>
 (function () {
-  // Onglets de l'aperçu produit.
+  // Onglets de l'aperçu produit — se comportent comme un petit carrousel :
+  // défilement automatique entre les 3 vues (comme sur les landing pages
+  // d'apps de suivi d'habitudes), avec légende, barre de progression par
+  // onglet, pause au survol/interaction et respect de prefers-reduced-motion.
+  var tabBar = document.querySelector('.tab-bar');
   var tabs = document.querySelectorAll('.tab-btn');
   var panels = document.querySelectorAll('.tab-panel');
+  var captionEl = document.querySelector('.tab-caption');
+  var order = ['today', 'calendar', 'stats'];
+  var captions = {
+    today: "Coche tes habitudes du jour, ta série se construit toute seule.",
+    calendar: "Un calendrier visuel : ta régularité en un coup d'œil, mois après mois.",
+    stats: "Taux de complétion, tendances, meilleurs jours — en un clin d'œil."
+  };
+  var AUTOPLAY_MS = 4500;
+  var autoplayTimer = null;
+  var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function activateTab(tabName, isAuto) {
+    tabs.forEach(function (b) {
+      var active = b.getAttribute('data-tab') === tabName;
+      b.classList.toggle('active', active);
+      b.classList.remove('autoplaying');
+      b.setAttribute('aria-selected', active ? 'true' : 'false');
+    });
+    panels.forEach(function (p) {
+      p.classList.toggle('active', p.getAttribute('data-panel') === tabName);
+    });
+    if (captionEl && captions[tabName]) captionEl.textContent = captions[tabName];
+    if (!reduceMotion && isAuto !== false) {
+      var activeBtn = document.querySelector('.tab-btn[data-tab="' + tabName + '"]');
+      if (activeBtn) {
+        // Force un reflow pour rejouer l'animation de la barre de progression.
+        void activeBtn.offsetWidth;
+        activeBtn.classList.add('autoplaying');
+      }
+    }
+  }
+
+  function goToNext() {
+    var current = order.indexOf(document.querySelector('.tab-btn.active').getAttribute('data-tab'));
+    activateTab(order[(current + 1) % order.length]);
+  }
+
+  function startAutoplay() {
+    if (reduceMotion) return;
+    stopAutoplay();
+    autoplayTimer = setInterval(goToNext, AUTOPLAY_MS);
+  }
+
+  function stopAutoplay() {
+    if (autoplayTimer) { clearInterval(autoplayTimer); autoplayTimer = null; }
+  }
+
   tabs.forEach(function (btn) {
     btn.addEventListener('click', function () {
-      tabs.forEach(function (b) { b.classList.remove('active'); b.setAttribute('aria-selected', 'false'); });
-      panels.forEach(function (p) { p.classList.remove('active'); });
-      btn.classList.add('active');
-      btn.setAttribute('aria-selected', 'true');
-      document.querySelector('.tab-panel[data-panel="' + btn.getAttribute('data-tab') + '"]').classList.add('active');
+      activateTab(btn.getAttribute('data-tab'));
+      startAutoplay(); // clic manuel : on repart pour un cycle complet
     });
   });
+
+  if (tabBar) {
+    tabBar.addEventListener('mouseenter', stopAutoplay);
+    tabBar.addEventListener('mouseleave', startAutoplay);
+  }
+
+  activateTab('today');
+  startAutoplay();
 
   // Tracking (best-effort, non bloquant) des clics sur les CTA d'inscription —
   // ne doit jamais retarder la navigation vers signup/.

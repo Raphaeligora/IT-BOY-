@@ -1333,6 +1333,35 @@ button.action-chip:disabled { opacity: 0.5; cursor: not-allowed; transform: none
 .tab-panel { display: none; }
 .tab-panel.active { display: block; animation: fadeIn 0.3s ease; }
 
+/* Barre de progression de l'auto-play (carrousel "Aperçu produit") : se
+   redessine à chaque activation d'onglet, voir index.html activateTab(). */
+.tab-btn { position: relative; overflow: hidden; }
+.tab-btn.active::after {
+  content: '';
+  position: absolute;
+  left: 0; bottom: 0;
+  height: 2px;
+  width: 0%;
+  background: rgba(20,20,20,0.32);
+}
+.tab-btn.active.autoplaying::after {
+  animation: tab-progress var(--autoplay-ms, 4500ms) linear forwards;
+}
+@keyframes tab-progress { from { width: 0%; } to { width: 100%; } }
+
+.tab-caption {
+  margin: -14px 0 26px;
+  font-size: 13px;
+  color: #8A8A8A;
+  text-align: center;
+  max-width: 34ch;
+  min-height: 1.5em;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tab-btn.active.autoplaying::after { animation: none; }
+}
+
 /* ---- Landing : aperçu produit (mockup statique) ---- */
 .mockup-card {
   width: 100%;
