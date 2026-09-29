@@ -1405,63 +1405,16 @@ button.action-chip:disabled { opacity: 0.5; cursor: not-allowed; transform: none
   .product-window-body { padding: 24px 16px 6px; }
 }
 
-/* ---- Landing : aperçu produit (contenu, échelle "vrai dashboard") ---- */
-.mockup-card {
+/* ---- Landing : aperçu produit — vraies captures d'écran ----
+   Remplace le mockup dessiné en CSS par de vraies images du produit
+   (voir assets/img/landing/), affichées en plein cadre dans la fenêtre
+   .product-window. */
+.product-shot {
+  display: block;
   width: 100%;
-  max-width: 560px;
-  background: transparent;
-  border: none;
-  border-radius: 0;
-  padding: 0;
-  box-shadow: none;
-}
-.mockup-card-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 6px;
-}
-.mockup-card-head .title { font-family: 'Cinzel', serif; font-size: 16px; letter-spacing: 0.06em; color: var(--white); }
-.mockup-card-head .frac { font-size: 13.5px; color: var(--gold); }
-.mockup-overview { margin: 0 0 22px; font-size: 12.5px; color: var(--grey); }
-.mockup-track {
-  width: 100%;
-  height: 6px;
-  background: rgba(246,246,246,0.1);
-  border-radius: 3px;
-  overflow: hidden;
-  margin-bottom: 26px;
-}
-.mockup-track .fill { height: 100%; width: 75%; background: linear-gradient(90deg, var(--gold-bright), var(--gold)); }
-.mockup-row {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 16px 0;
-  border-top: 1px solid rgba(246,246,246,0.07);
-}
-.mockup-row:first-of-type { border-top: none; }
-.mockup-dot {
-  width: 26px; height: 26px;
-  border-radius: 50%;
-  border: 2px solid var(--mockup-accent, rgba(205,163,78,0.5));
-  flex: none;
-}
-.mockup-dot.done { background: var(--mockup-accent, var(--gold)); border-color: var(--mockup-accent, var(--gold)); box-shadow: 0 0 0 4px color-mix(in srgb, var(--mockup-accent, var(--gold)) 16%, transparent); }
-.mockup-row .info { flex: 1; display: flex; flex-direction: column; gap: 7px; min-width: 0; }
-.mockup-row .name { font-size: 15px; color: var(--white); }
-.mockup-row .mini-week { display: flex; gap: 5px; }
-.mockup-row .mini-week span { width: 7px; height: 7px; border-radius: 50%; background: rgba(246,246,246,0.12); }
-.mockup-row .mini-week span.done { background: var(--mockup-accent, var(--gold)); }
-.mockup-row .streak { display: flex; align-items: center; gap: 5px; font-size: 13.5px; color: var(--mockup-accent, var(--gold)); white-space: nowrap; }
-.mockup-row .streak.tracker-tag {
-  font-size: 10px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  background: color-mix(in srgb, var(--mockup-accent, var(--gold)) 14%, transparent);
-  border: 1px solid color-mix(in srgb, var(--mockup-accent, var(--gold)) 30%, transparent);
-  border-radius: 999px;
-  padding: 4px 10px;
+  height: auto;
+  border-radius: 14px;
+  box-shadow: 0 20px 50px -25px rgba(0,0,0,0.6);
 }
 
 /* ---- Landing : grille de fonctionnalités ---- */
@@ -1672,12 +1625,3 @@ button.action-chip:disabled { opacity: 0.5; cursor: not-allowed; transform: none
   html.js-reveal .reveal.in-view { opacity: 1; transform: translateY(0); }
 }
 
-/* ---- Landing : preview secondaire (stats) ---- */
-.mockup-stats-note {
-  margin-top: 14px;
-  text-align: center;
-  font-size: 11px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--gold);
-}
