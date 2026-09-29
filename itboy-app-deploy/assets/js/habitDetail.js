@@ -253,6 +253,8 @@
       return;
     }
 
+    window.ITBOY.ui.showLoading(statsEl);
+
     var user = await window.ITBOY.auth.requireUser('../login/');
     if (!user) return;
 

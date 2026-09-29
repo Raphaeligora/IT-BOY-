@@ -17,6 +17,9 @@
 
   var sortToggleEl = document.getElementById('sort-toggle');
   var greetingEl = document.getElementById('greeting');
+  var nudgeEl = document.getElementById('evening-nudge');
+
+  var MILESTONES = [3, 7, 14, 30, 50, 100, 200, 365];
 
   var user = null;
   var profile = null;
@@ -95,6 +98,62 @@
       '<div class="today-progress-track"><div class="today-progress-fill" style="width:' + pct + '%"></div></div>' +
       '<span class="today-progress-label">' + doneCount + '/' + habits.length + ' faites</span>' +
       '</div>';
+  }
+
+  // Relance douce si rien n'est encore coché en fin de journée (>= 17h,
+  // heure locale du navigateur) - jamais plus d'une fois par jour, un
+  // "Masquer" mémorisé en localStorage évite de re-harceler au reload.
+  function renderEveningNudge() {
+    if (!nudgeEl) return;
+    var today = todayStr();
+    var doneToday = habits.filter(function (h) {
+      return (logsByHabit[h.id] || []).indexOf(today) !== -1;
+    }).length;
+    var dismissKey = 'itboy_nudge_dismissed_' + today;
+    var dismissed = false;
+    try { dismissed = localStorage.getItem(dismissKey) === '1'; } catch (e) { }
+
+    var shouldShow = habits.length > 0 && new Date().getHours() >= 17 && doneToday === 0 && !dismissed;
+    if (!shouldShow) {
+      nudgeEl.style.display = 'none';
+      nudgeEl.innerHTML = '';
+      return;
+    }
+
+    nudgeEl.style.display = '';
+    nudgeEl.innerHTML = '<div class="banner-nudge">' +
+      '<span>Encore rien coché aujourd\'hui — une petite habitude vaut mieux que zéro.</span>' +
+      '<button type="button" class="nudge-dismiss" id="nudge-dismiss-btn">Masquer</button>' +
+      '</div>';
+    var dismissBtn = document.getElementById('nudge-dismiss-btn');
+    if (dismissBtn) {
+      dismissBtn.addEventListener('click', function () {
+        nudgeEl.style.display = 'none';
+        nudgeEl.innerHTML = '';
+        try { localStorage.setItem(dismissKey, '1'); } catch (e) { }
+      });
+    }
+  }
+
+  // Petite récompense visuelle : palier de streak atteint, ou journée
+  // 100% faite. Un seul toast à la fois (le palier de streak prime).
+  function celebrateIfNeeded(habitId) {
+    var habit = habits.find(function (h) { return h.id === habitId; });
+    if (!habit) return;
+    var today = todayStr();
+    var streak = window.ITBOY.streak.computeCurrentStreak(logsByHabit[habitId] || [], today);
+
+    if (MILESTONES.indexOf(streak) !== -1) {
+      window.ITBOY.ui.showToast('🔥 ' + streak + ' jours d\'affilée sur « ' + habit.name + ' » !', { variant: 'celebrate', duration: 5000 });
+      return;
+    }
+
+    var doneCount = habits.filter(function (h) {
+      return (logsByHabit[h.id] || []).indexOf(today) !== -1;
+    }).length;
+    if (habits.length > 1 && doneCount === habits.length) {
+      window.ITBOY.ui.showToast('✅ Journée complète — ' + habits.length + '/' + habits.length + ' habitudes faites !', { variant: 'celebrate', duration: 5000 });
+    }
   }
 
   // "Par activité" : la plus recemment cochee en premier (habitude jamais
@@ -207,6 +266,8 @@
       renderHabitList();
       renderTodayProgress();
       renderOverview();
+      renderEveningNudge();
+      if (!doneToday) celebrateIfNeeded(habitId);
     } catch (err) {
       window.ITBOY.ui.showError(bannerZone, err);
     }
@@ -214,9 +275,36 @@
 
   async function archiveHabit(habitId) {
     bannerZone.innerHTML = '';
+    var habit = habits.find(function (h) { return h.id === habitId; });
     try {
       await window.ITBOY.api.archiveHabit(habitId);
       habits = habits.filter(function (h) { return h.id !== habitId; });
+      renderLimitNote();
+      renderHabitList();
+      renderTodayProgress();
+      renderOverview();
+      if (habit) {
+        window.ITBOY.ui.showToast('« ' + habit.name + ' » archivée.', {
+          actionLabel: 'Annuler',
+          duration: 6000,
+          onAction: function () { undoArchive(habit); }
+        });
+      }
+    } catch (err) {
+      window.ITBOY.ui.showError(bannerZone, err);
+    }
+  }
+
+  // Rattrapage immediat depuis le toast d'archivage - reutilise
+  // reactivateHabit (meme chemin que /archived/), pas de logique
+  // dupliquee. logsByHabit[habit.id] n'a jamais ete supprime a
+  // l'archivage donc son historique revient intact.
+  async function undoArchive(habit) {
+    bannerZone.innerHTML = '';
+    try {
+      await window.ITBOY.api.reactivateHabit(habit.id, habits.length + 1);
+      habits.push(habit);
+      if (!logsByHabit[habit.id]) logsByHabit[habit.id] = [];
       renderLimitNote();
       renderHabitList();
       renderTodayProgress();
@@ -290,6 +378,8 @@
       return;
     }
 
+    window.ITBOY.ui.showLoading(listEl);
+
     user = await window.ITBOY.auth.requireUser('../login/');
     if (!user) return;
 
@@ -323,6 +413,7 @@
       renderHabitList();
       renderTodayProgress();
       renderOverview();
+      renderEveningNudge();
     } catch (err) {
       window.ITBOY.ui.showError(bannerZone, err);
     }

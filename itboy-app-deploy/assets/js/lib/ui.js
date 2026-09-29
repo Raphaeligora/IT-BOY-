@@ -15,6 +15,13 @@
     container.innerHTML = '<div class="banner-error">' + escapeHtml(message) + '</div>';
   }
 
+  // Etat de chargement générique — évite un écran blanc le temps que
+  // Supabase réponde. A appeler juste avant les premiers await d'un
+  // init(), le rendu final remplacera ce placeholder via innerHTML.
+  function showLoading(container, label) {
+    container.innerHTML = '<p class="loading-state">' + escapeHtml(label || 'Chargement…') + '</p>';
+  }
+
   function escapeHtml(str) {
     return String(str)
       .replace(/&/g, '&amp;')
@@ -41,6 +48,56 @@
       '</div></nav>';
   }
 
+  // Toasts — petites notifications ephemeres en bas d'ecran, injectees
+  // au premier appel (pas besoin d'un element dedie dans chaque page
+  // HTML). Utilise pour la celebration (streaks/journee complete) et
+  // pour "Annuler" apres un archivage.
+  function ensureToastRoot() {
+    var root = document.getElementById('itboy-toast-root');
+    if (!root) {
+      root = document.createElement('div');
+      root.id = 'itboy-toast-root';
+      root.className = 'toast-root';
+      document.body.appendChild(root);
+    }
+    return root;
+  }
+
+  function showToast(message, opts) {
+    opts = opts || {};
+    var root = ensureToastRoot();
+    var toast = document.createElement('div');
+    toast.className = 'toast' + (opts.variant ? ' toast-' + opts.variant : '');
+
+    var msg = document.createElement('span');
+    msg.className = 'toast-message';
+    msg.textContent = message;
+    toast.appendChild(msg);
+
+    var timeoutId;
+    function dismiss() {
+      clearTimeout(timeoutId);
+      toast.classList.add('toast-leaving');
+      setTimeout(function () { if (toast.parentNode) toast.parentNode.removeChild(toast); }, 200);
+    }
+
+    if (opts.actionLabel && opts.onAction) {
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'toast-action';
+      btn.textContent = opts.actionLabel;
+      btn.addEventListener('click', function () {
+        opts.onAction();
+        dismiss();
+      });
+      toast.appendChild(btn);
+    }
+
+    root.appendChild(toast);
+    timeoutId = setTimeout(dismiss, opts.duration || 4000);
+    return { dismiss: dismiss };
+  }
+
   function mountNav(active) {
     var mount = document.getElementById('nav-mount');
     if (!mount) return;
@@ -55,6 +112,8 @@
   global.ITBOY.ui = {
     showConfigBanner: showConfigBanner,
     showError: showError,
+    showLoading: showLoading,
+    showToast: showToast,
     escapeHtml: escapeHtml,
     renderNav: renderNav,
     mountNav: mountNav

@@ -56,6 +56,8 @@
   }
 
   async function init() {
+    window.ITBOY.ui.showLoading(listEl);
+
     user = await window.ITBOY.auth.requireUser('../login/');
     if (!user) return;
 

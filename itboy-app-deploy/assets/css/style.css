@@ -914,6 +914,101 @@ a { color: var(--gold); text-decoration: none; }
   font-size: 13.5px;
 }
 
+.loading-state {
+  width: 100%;
+  max-width: 640px;
+  text-align: center;
+  padding: 48px 20px;
+  color: var(--grey);
+  font-size: 13.5px;
+  animation: loading-pulse 1.3s ease-in-out infinite;
+}
+@keyframes loading-pulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.9; }
+}
+
+/* Toasts (assets/js/lib/ui.js showToast) */
+.toast-root {
+  position: fixed;
+  left: 50%;
+  bottom: 24px;
+  transform: translateX(-50%);
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  width: calc(100% - 32px);
+  max-width: 420px;
+  pointer-events: none;
+}
+.toast {
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: var(--bg-card);
+  border: 1px solid rgba(246,246,246,0.14);
+  border-radius: 999px;
+  padding: 12px 20px;
+  box-shadow: 0 16px 32px -14px rgba(0,0,0,0.6);
+  animation: toast-in 0.22s ease-out;
+  max-width: 100%;
+}
+.toast.toast-celebrate { border-color: rgba(205,163,78,0.55); background: #14243C; }
+.toast-message { font-size: 13px; color: var(--white); flex: 1; }
+.toast-action {
+  background: none;
+  border: none;
+  color: var(--gold);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  flex: none;
+  padding: 0;
+}
+.toast-action:hover { color: var(--white); }
+.toast-leaving { animation: toast-out 0.2s ease-in forwards; }
+@keyframes toast-in {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes toast-out {
+  from { opacity: 1; transform: translateY(0); }
+  to { opacity: 0; transform: translateY(12px); }
+}
+@media (max-width: 480px) {
+  .toast-root { bottom: 16px; }
+  .toast { border-radius: 14px; }
+}
+
+/* Bandeau doux de relance en fin de journee (dashboard) */
+.banner-nudge {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+  border: 1px dashed rgba(205,163,78,0.4);
+  border-radius: 2px;
+  padding: 14px 18px;
+  font-size: 13px;
+  color: var(--grey);
+  margin-bottom: 20px;
+}
+.nudge-dismiss {
+  background: none;
+  border: none;
+  color: var(--grey);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  flex: none;
+}
+.nudge-dismiss:hover { color: var(--white); }
+
 /* Page /stats/combined — selection multi-habitudes (chips a bascule,
    plusieurs actives a la fois, contrairement a .tab-bar) + une carte
    .compare-card par habitude selectionnee (metriques + heatmap annee). */

@@ -170,6 +170,8 @@
   }
 
   async function init() {
+    window.ITBOY.ui.showLoading(zone);
+
     var user = await window.ITBOY.auth.requireUser();
     if (!user) return;
 
