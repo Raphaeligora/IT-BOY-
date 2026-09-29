@@ -1351,12 +1351,17 @@ button.action-chip:disabled { opacity: 0.5; cursor: not-allowed; transform: none
 
 .tab-caption {
   padding: 0 28px;
-  font-size: 13.5px;
-  color: #8A8A8A;
+  font-family: 'Cinzel', serif;
+  font-size: clamp(16px, 2.4vw, 21px);
+  font-weight: 500;
+  line-height: 1.4;
+  color: var(--white);
   text-align: center;
-  max-width: 46ch;
-  min-height: 1.5em;
+  max-width: 30ch;
+  min-height: 2.6em;
+  margin: 4px auto 0;
 }
+.tab-caption strong { color: var(--gold); font-weight: 500; }
 
 @media (prefers-reduced-motion: reduce) {
   .tab-btn.active.autoplaying::after { animation: none; }
@@ -1370,7 +1375,7 @@ button.action-chip:disabled { opacity: 0.5; cursor: not-allowed; transform: none
    heatmap) qui peuvent enfin respirer à leur taille naturelle. */
 .product-window {
   width: 100%;
-  max-width: 720px;
+  max-width: 1040px;
   background: linear-gradient(155deg, var(--bg-card-2) 0%, var(--bg-card) 55%, #0D1727 100%);
   border: 1px solid var(--line-strong);
   border-radius: 24px;

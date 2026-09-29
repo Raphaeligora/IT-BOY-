@@ -67,7 +67,7 @@
       </div>
     </div>
 
-    <p class="tab-caption" aria-live="polite">Coche tes habitudes du jour, ta série se construit toute seule.</p>
+    <p class="tab-caption" aria-live="polite">Un jour manqué ? <strong>Plus jamais.</strong></p>
 
     <div class="product-window-body">
 
@@ -484,9 +484,9 @@
   var captionEl = document.querySelector('.tab-caption');
   var order = ['today', 'calendar', 'stats'];
   var captions = {
-    today: "Coche tes habitudes du jour, ta série se construit toute seule.",
-    calendar: "Un calendrier visuel : ta régularité en un coup d'œil, mois après mois.",
-    stats: "Taux de complétion, tendances, meilleurs jours — en un clin d'œil."
+    today: "Un jour manqué ? <strong>Plus jamais.</strong>",
+    calendar: "Ta régularité, <strong>visible en un coup d'œil.</strong>",
+    stats: "Les chiffres ne mentent pas : <strong>regarde-toi progresser.</strong>"
   };
   var AUTOPLAY_MS = 4500;
   var autoplayTimer = null;
@@ -502,7 +502,7 @@
     panels.forEach(function (p) {
       p.classList.toggle('active', p.getAttribute('data-panel') === tabName);
     });
-    if (captionEl && captions[tabName]) captionEl.textContent = captions[tabName];
+    if (captionEl && captions[tabName]) captionEl.innerHTML = captions[tabName];
     if (!reduceMotion && isAuto !== false) {
       var activeBtn = document.querySelector('.tab-btn[data-tab="' + tabName + '"]');
       if (activeBtn) {
