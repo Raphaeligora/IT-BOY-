@@ -28,18 +28,27 @@
 
   <div class="habit-stats" id="habit-stats"></div>
 
-  <div class="year-heatmap-wrap">
-    <div class="year-heatmap-scroll">
-      <div class="year-heatmap-months" id="heatmap-months"></div>
-      <div class="year-heatmap-body">
-        <div class="year-heatmap-daylabels">
-          <span>Lun</span><span></span><span>Mer</span><span></span><span>Ven</span><span></span><span></span>
+  <div class="chart-card" style="max-width:720px">
+    <div class="chart-head">
+      <span class="chart-title">Activité annuelle</span>
+      <span class="link-muted" id="heatmap-caption">30 derniers jours</span>
+    </div>
+    <div class="year-heatmap-wrap">
+      <div class="year-heatmap-scroll">
+        <div class="year-heatmap-months" id="heatmap-months"></div>
+        <div class="year-heatmap-body">
+          <div class="year-heatmap-daylabels">
+            <span>Lun</span><span></span><span>Mer</span><span></span><span>Ven</span><span></span><span></span>
+          </div>
+          <div class="year-heatmap" id="heatmap"></div>
         </div>
-        <div class="year-heatmap" id="heatmap"></div>
       </div>
     </div>
+    <div class="chart-legend" style="justify-content:flex-start;margin-top:16px">
+      <span><span class="swatch" style="background:var(--gold)"></span>Coché</span>
+      <span><span class="swatch" style="background:rgba(246,246,246,0.12)"></span>Non coché</span>
+    </div>
   </div>
-  <p class="plan-note" id="heatmap-caption">30 derniers jours</p>
 
   <div id="note-zone" style="width:100%;max-width:720px"></div>
 

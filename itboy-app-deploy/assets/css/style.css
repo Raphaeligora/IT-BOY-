@@ -952,13 +952,11 @@ button.action-chip:disabled { opacity: 0.5; cursor: not-allowed; transform: none
 .heatmap .cell.done { background: linear-gradient(135deg, var(--gold-bright), var(--gold)); box-shadow: 0 0 6px rgba(205,163,78,0.5); }
 .heatmap .cell.future { background: transparent; }
 
-/* Heatmap annuelle façon GitHub (detail d'habitude) — colonnes = semaines
-   (lun -> dim), defile horizontalement sur petit ecran plutot que de
-   tasser les cellules. */
+/* Heatmap annuelle façon GitHub (detail d'habitude, dans un .chart-card) —
+   colonnes = semaines (lun -> dim), defile horizontalement sur petit ecran
+   plutot que de tasser les cellules. */
 .year-heatmap-wrap {
   width: 100%;
-  max-width: 720px;
-  margin-bottom: 8px;
 }
 .year-heatmap-scroll {
   overflow-x: auto;
@@ -966,15 +964,16 @@ button.action-chip:disabled { opacity: 0.5; cursor: not-allowed; transform: none
 }
 .year-heatmap-months {
   display: flex;
-  gap: 3px;
-  margin-bottom: 4px;
-  padding-left: 30px;
+  gap: 4px;
+  margin-bottom: 6px;
+  padding-left: 32px;
   min-width: max-content;
 }
 .year-heatmap-months span {
-  width: 11px;
+  width: 12px;
   flex: none;
   font-size: 10px;
+  letter-spacing: 0.02em;
   color: var(--grey);
   white-space: nowrap;
 }
@@ -986,32 +985,41 @@ button.action-chip:disabled { opacity: 0.5; cursor: not-allowed; transform: none
 .year-heatmap-daylabels {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 4px;
   flex: none;
-  width: 26px;
+  width: 28px;
 }
 .year-heatmap-daylabels span {
-  height: 11px;
-  line-height: 11px;
+  height: 12px;
+  line-height: 12px;
   font-size: 9px;
   color: var(--grey);
 }
 .year-heatmap {
   display: flex;
-  gap: 3px;
+  gap: 4px;
 }
 .year-heatmap .week-col {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 4px;
 }
 .year-heatmap .cell {
-  width: 11px;
-  height: 11px;
-  border-radius: 2px;
-  background: rgba(246,246,246,0.07);
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  background: rgba(246,246,246,0.06);
+  border: 1px solid rgba(246,246,246,0.04);
+  transition: transform 0.12s, box-shadow 0.12s, background 0.12s;
 }
-.year-heatmap .cell.done { background: var(--gold); }
+.year-heatmap .cell.done {
+  background: linear-gradient(135deg, var(--gold-bright), var(--gold));
+  border-color: transparent;
+  box-shadow: 0 0 5px rgba(205,163,78,0.45);
+}
+.year-heatmap .cell.today { box-shadow: 0 0 0 1.5px var(--gold-bright); }
+.year-heatmap .cell.done.today { box-shadow: 0 0 0 1.5px var(--gold-bright), 0 0 5px rgba(205,163,78,0.45); }
+.year-heatmap .cell:hover { transform: scale(1.35); position: relative; z-index: 1; }
 .year-heatmap .cell.empty { visibility: hidden; }
 
 /* Statistiques détaillées (Premium) — tuiles supplémentaires + graphiques */

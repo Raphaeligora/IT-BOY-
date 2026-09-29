@@ -55,7 +55,7 @@
         var cellDate = new Date(weekStart);
         cellDate.setDate(weekStart.getDate() + d);
         var str = window.ITBOY.streak._dateStr(cellDate);
-        weekCells.push({ str: str, done: !!done[str], future: cellDate > today });
+        weekCells.push({ str: str, done: !!done[str], future: cellDate > today, today: cellDate.getTime() === today.getTime() });
 
         if (d === 0 && cellDate.getMonth() !== lastMonth) {
           lastMonth = cellDate.getMonth();
@@ -76,8 +76,8 @@
 
     heatmapEl.innerHTML = weeks.map(function (week) {
       return '<div class="week-col">' + week.map(function (c) {
-        var cls = 'cell' + (c.future ? ' empty' : (c.done ? ' done' : ''));
-        return '<span class="' + cls + '" title="' + c.str + '"></span>';
+        var cls = 'cell' + (c.future ? ' empty' : (c.done ? ' done' : '')) + (c.today ? ' today' : '');
+        return '<span class="' + cls + '" title="' + c.str + (c.today ? ' (aujourd\'hui)' : '') + '"></span>';
       }).join('') + '</div>';
     }).join('');
   }
