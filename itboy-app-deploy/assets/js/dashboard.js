@@ -18,6 +18,7 @@
   var sortToggleEl = document.getElementById('sort-toggle');
   var greetingEl = document.getElementById('greeting');
   var nudgeEl = document.getElementById('evening-nudge');
+  var exportBtn = document.getElementById('export-csv-btn');
 
   var MILESTONES = [3, 7, 14, 30, 50, 100, 200, 365];
 
@@ -29,6 +30,11 @@
   // cf. getLogsForUser) - tenu a jour localement sans refetch a chaque
   // coche/decoche pour le bandeau de vue d'ensemble.
   var totalCheckins = 0;
+  // Streak freeze : jetons utilises ce mois-ci / plafond selon le plan
+  // (voir FREEZE_LIMITS, assets/js/lib/plans.js). Recharge au init(),
+  // mis a jour localement a chaque freeze pour eviter un refetch.
+  var freezeUsed = 0;
+  var freezeLimit = 0;
   // 'activity' (par defaut) : la plus recemment cochee en premier.
   // 'manual' : ordre choisi par glisser-deposer, persiste en base (habits.position).
   var sortMode = 'activity';
@@ -38,6 +44,14 @@
   // ouvert a cheval sur minuit, un "coché aujourd'hui" doit refleter le
   // nouveau jour, pas rester bloqué sur la date du chargement de la page.
   function todayStr() { return window.ITBOY.api.todayStr(); }
+
+  function yesterdayStr() {
+    var parts = todayStr().split('-').map(Number);
+    var d = new Date(parts[0], parts[1] - 1, parts[2]);
+    d.setDate(d.getDate() - 1);
+    var pad = function (n) { return String(n).padStart(2, '0'); };
+    return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+  }
 
   function planLimit() {
     return window.ITBOY.PLAN_LIMITS[profile.plan] || 3;
@@ -56,7 +70,11 @@
   function renderOverview() {
     if (!overviewEl) return;
     var today = todayStr();
-    var bestStreak = habits.reduce(function (max, h) {
+    // Streak quotidien : n'a de sens que pour les habitudes "daily" (une
+    // habitude hebdomadaire a sa propre notion de serie, en semaines -
+    // voir renderHabitList - donc exclue de ce tuile pour ne pas melanger
+    // deux unites differentes dans le meme chiffre).
+    var bestStreak = habits.filter(function (h) { return h.frequency !== 'weekly'; }).reduce(function (max, h) {
       var streak = window.ITBOY.streak.computeCurrentStreak(logsByHabit[h.id] || [], today);
       return Math.max(max, streak);
     }, 0);
@@ -141,11 +159,20 @@
     var habit = habits.find(function (h) { return h.id === habitId; });
     if (!habit) return;
     var today = todayStr();
-    var streak = window.ITBOY.streak.computeCurrentStreak(logsByHabit[habitId] || [], today);
 
-    if (MILESTONES.indexOf(streak) !== -1) {
-      window.ITBOY.ui.showToast('🔥 ' + streak + ' jours d\'affilée sur « ' + habit.name + ' » !', { variant: 'celebrate', duration: 5000 });
-      return;
+    if (habit.frequency === 'weekly') {
+      var target = habit.frequency_per_week || 1;
+      var weekCount = window.ITBOY.streak.completionsThisWeek(logsByHabit[habitId] || [], today);
+      if (weekCount === target) {
+        window.ITBOY.ui.showToast('🎯 Objectif de la semaine atteint sur « ' + habit.name + ' » (' + target + '/' + target + ') !', { variant: 'celebrate', duration: 5000 });
+        return;
+      }
+    } else {
+      var streak = window.ITBOY.streak.computeCurrentStreak(logsByHabit[habitId] || [], today);
+      if (MILESTONES.indexOf(streak) !== -1) {
+        window.ITBOY.ui.showToast('🔥 ' + streak + ' jours d\'affilée sur « ' + habit.name + ' » !', { variant: 'celebrate', duration: 5000 });
+        return;
+      }
     }
 
     var doneCount = habits.filter(function (h) {
@@ -181,13 +208,37 @@
     var today = todayStr();
     var manual = sortMode === 'manual';
 
+    var yesterday = yesterdayStr();
+    var canFreeze = freezeUsed < freezeLimit;
+
     listEl.innerHTML = displayHabits().map(function (h) {
       var dates = logsByHabit[h.id] || [];
       var doneToday = dates.indexOf(today) !== -1;
-      var streak = window.ITBOY.streak.computeCurrentStreak(dates, today);
+      var isWeekly = h.frequency === 'weekly';
       var weekDots = week.map(function (d) {
         return '<span class="d' + (dates.indexOf(d) !== -1 ? ' done' : '') + '"></span>';
       }).join('');
+
+      var indicatorHtml;
+      if (isWeekly) {
+        var target = h.frequency_per_week || 1;
+        var weekCount = window.ITBOY.streak.completionsThisWeek(dates, today);
+        indicatorHtml = '<div class="streak-indicator weekly" title="Cette semaine">' +
+          '<span class="dot"></span>' + weekCount + '/' + target + '</div>';
+      } else {
+        var streak = window.ITBOY.streak.computeCurrentStreak(dates, today);
+        indicatorHtml = '<div class="streak-indicator"><span class="dot"></span>' + streak + '</div>';
+      }
+
+      // Freeze : ne proposer que pour une habitude quotidienne dont hier
+      // n'a pas ete cochee (protege la chaine avant qu'elle ne se casse).
+      var showFreeze = !isWeekly && dates.indexOf(yesterday) === -1;
+      var freezeBtn = showFreeze
+        ? '<button class="freeze-btn" data-action="freeze" type="button" title="' +
+          (canFreeze ? 'Proteger hier (' + (freezeLimit - freezeUsed) + ' jeton' + (freezeLimit - freezeUsed > 1 ? 's' : '') + ' restant)' : 'Plus de jeton ce mois-ci') +
+          '"' + (canFreeze ? '' : ' disabled') + '>❄️</button>'
+        : '';
+
       return '<div class="habit-row' + (manual ? ' draggable' : '') + '" data-habit-id="' + h.id + '"' + (manual ? ' draggable="true"' : '') + '>' +
         (manual ? '<span class="drag-handle" aria-hidden="true">⠿</span>' : '') +
         '<button class="habit-checkbox' + (doneToday ? ' done' : '') + '" data-action="toggle" aria-label="Fait aujourd\'hui"></button>' +
@@ -196,7 +247,8 @@
         '<span class="category">' + (window.ITBOY.CATEGORY_LABELS[h.category] || h.category) + '</span>' +
         '<div class="mini-week" aria-hidden="true">' + weekDots + '</div>' +
         '</div>' +
-        '<div class="streak-indicator"><span class="dot"></span>' + streak + '</div>' +
+        indicatorHtml +
+        freezeBtn +
         '<a class="detail-link" href="../habits/?id=' + h.id + '">Detail</a>' +
         '<button class="archive-btn" data-action="archive">Archiver</button>' +
         '</div>';
@@ -208,8 +260,33 @@
     listEl.querySelectorAll('[data-action="archive"]').forEach(function (btn) {
       btn.addEventListener('click', function () { archiveHabit(btn.closest('.habit-row').getAttribute('data-habit-id')); });
     });
+    listEl.querySelectorAll('[data-action="freeze"]').forEach(function (btn) {
+      btn.addEventListener('click', function () { freezeYesterday(btn.closest('.habit-row').getAttribute('data-habit-id')); });
+    });
 
     if (manual) bindDragAndDrop();
+  }
+
+  // Utilise un jeton de freeze pour proteger la journee d'hier (non
+  // cochee) sur une habitude - insere une coche source='freeze' qui
+  // compte pour le streak sans etre une vraie coche (cf. api.js).
+  async function freezeYesterday(habitId) {
+    if (freezeUsed >= freezeLimit) return;
+    bannerZone.innerHTML = '';
+    var habit = habits.find(function (h) { return h.id === habitId; });
+    var yesterday = yesterdayStr();
+    try {
+      await window.ITBOY.api.freezeDay(user.id, habitId, yesterday);
+      logsByHabit[habitId] = (logsByHabit[habitId] || []).concat([yesterday]);
+      freezeUsed += 1;
+      renderHabitList();
+      renderOverview();
+      if (habit) {
+        window.ITBOY.ui.showToast('❄️ Streak protégé sur « ' + habit.name + ' » (' + (freezeLimit - freezeUsed) + ' jeton' + (freezeLimit - freezeUsed !== 1 ? 's' : '') + ' restant ce mois-ci).');
+      }
+    } catch (err) {
+      window.ITBOY.ui.showError(bannerZone, err);
+    }
   }
 
   // Glisser-deposer natif (HTML5 drag events) pour le tri "Manuel" - pas
@@ -314,6 +391,59 @@
     }
   }
 
+  // Export CSV : habitudes actives ET archivees (une ligne par coche),
+  // genere entierement cote client (pas d'appel serveur dedie).
+  async function exportCsv() {
+    if (!exportBtn) return;
+    exportBtn.disabled = true;
+    bannerZone.innerHTML = '';
+    try {
+      var allHabits = await window.ITBOY.api.getHabits(user.id, {});
+      var allLogs = await window.ITBOY.api.getLogsForUser(user.id);
+      var habitMap = {};
+      allHabits.forEach(function (h) { habitMap[h.id] = h; });
+
+      var rows = [['Habitude', 'Categorie', 'Frequence', 'Date', 'Type', 'Note']];
+      allLogs.slice().sort(function (a, b) { return a.completed_date < b.completed_date ? -1 : (a.completed_date > b.completed_date ? 1 : 0); })
+        .forEach(function (log) {
+          var h = habitMap[log.habit_id];
+          rows.push([
+            h ? h.name : log.habit_id,
+            h ? (window.ITBOY.CATEGORY_LABELS[h.category] || h.category) : '',
+            h ? (h.frequency === 'weekly' ? (h.frequency_per_week || 1) + 'x/semaine' : 'Quotidienne') : '',
+            log.completed_date,
+            log.source === 'freeze' ? 'Jour protégé' : 'Coche',
+            log.note || ''
+          ]);
+        });
+
+      var csv = rows.map(function (r) {
+        return r.map(function (cell) {
+          var s = String(cell == null ? '' : cell);
+          if (/[",\n;]/.test(s)) s = '"' + s.replace(/"/g, '""') + '"';
+          return s;
+        }).join(',');
+      }).join('\r\n');
+
+      var blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8' });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = 'itboy-export-' + todayStr() + '.csv';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+      window.ITBOY.track('data_exported', { rows: rows.length - 1 });
+    } catch (err) {
+      window.ITBOY.ui.showError(bannerZone, err);
+    } finally {
+      exportBtn.disabled = false;
+    }
+  }
+
+  if (exportBtn) exportBtn.addEventListener('click', exportCsv);
+
   addToggleBtn.addEventListener('click', function () {
     var atLimit = habits.length >= planLimit();
     if (atLimit) {
@@ -408,6 +538,13 @@
         logsByHabit[log.habit_id].push(log.completed_date);
       });
       totalCheckins = allLogs.length;
+
+      freezeLimit = (window.ITBOY.FREEZE_LIMITS || {})[profile.plan] || 0;
+      try {
+        freezeUsed = await window.ITBOY.api.getFreezeCountThisMonth(user.id);
+      } catch (e) {
+        freezeUsed = 0; // comptage non bloquant : au pire le bouton reste actif un peu plus large
+      }
 
       renderLimitNote();
       renderHabitList();

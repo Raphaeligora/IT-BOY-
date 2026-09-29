@@ -11,6 +11,11 @@
   // un plafond volontairement absurde qu'aucun humain n'atteindra.
   var PLAN_LIMITS = { free: 3, premium: 999999 };
 
+  // Streak freeze (2026-09-29) : jetons mensuels qui protegent un jour
+  // manque sans casser le streak (voir dashboard.js). Verifie cote
+  // front uniquement - confort de motivation, pas une regle de securite.
+  var FREEZE_LIMITS = { free: 1, premium: 4 };
+
   var PLANS = [
     {
       id: 'free',
@@ -33,5 +38,6 @@
 
   global.ITBOY = global.ITBOY || {};
   global.ITBOY.PLAN_LIMITS = PLAN_LIMITS;
+  global.ITBOY.FREEZE_LIMITS = FREEZE_LIMITS;
   global.ITBOY.PLANS = PLANS;
 })(window);

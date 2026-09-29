@@ -114,6 +114,42 @@
           if (res.error) throw res.error;
    }
 
+   // Enregistre/efface la note libre d'une coche existante (habit_logs.note).
+   // Ne cree jamais de ligne : la coche doit deja exister (voir markDoneToday).
+   async function updateLogNote(habitId, dateStr, note) {
+          var res = await db().from('habit_logs').update({ note: note || null }).eq('habit_id', habitId).eq('completed_date', dateStr);
+          if (res.error) throw res.error;
+   }
+
+   // Streak freeze : protege un jour manque en inserant une coche
+   // source='freeze' (comptee par le calcul de streak, cf. streak.js,
+   // mais distinguee visuellement et non comptee comme une vraie coche
+   // dans les celebrations/exports). Un seul jeton par jour utilise -
+   // le trigger unique(habit_id, completed_date) empeche un doublon si
+   // le jour est deja coche.
+   async function freezeDay(userId, habitId, dateStr) {
+          var res = await db().from('habit_logs').insert({
+                   user_id: userId,
+                   habit_id: habitId,
+                   completed_date: dateStr,
+                   source: 'freeze'
+          });
+          if (res.error) throw res.error;
+   }
+
+   // Nombre de freezes deja utilises ce mois-ci (tous logs confondus,
+   // toutes habitudes) - sert a plafonner selon le plan (voir
+   // FREEZE_LIMITS dans dashboard.js).
+   async function getFreezeCountThisMonth(userId) {
+          var now = new Date();
+          var pad = function (n) { return String(n).padStart(2, '0'); };
+          var firstOfMonth = now.getFullYear() + '-' + pad(now.getMonth() + 1) + '-01';
+          var res = await db().from('habit_logs').select('id', { count: 'exact', head: true })
+                   .eq('user_id', userId).eq('source', 'freeze').gte('completed_date', firstOfMonth);
+          if (res.error) throw res.error;
+          return res.count || 0;
+   }
+
    global.ITBOY = global.ITBOY || {};
      global.ITBOY.api = {
             todayStr: todayStr,
@@ -129,6 +165,9 @@
             getLogs: getLogs,
             getLogsForUser: getLogsForUser,
             markDoneToday: markDoneToday,
-            unmarkDoneToday: unmarkDoneToday
+            unmarkDoneToday: unmarkDoneToday,
+            updateLogNote: updateLogNote,
+            freezeDay: freezeDay,
+            getFreezeCountThisMonth: getFreezeCountThisMonth
      };
 })(window);

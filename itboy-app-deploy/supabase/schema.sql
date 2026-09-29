@@ -318,3 +318,19 @@ from (
   from public.habits
 ) sub
 where h.id = sub.id and h.position = 0;
+
+-- ============================================================
+-- 9. Migration UX (2026-09-29) - note libre par coche + streak
+--    freeze (jeton mensuel qui protege un jour manque sans casser
+--    le streak). Une coche "freeze" est une ligne habit_logs comme
+--    une autre (donc comptee par le calcul de streak cote front,
+--    voir streak.js) mais marquee source='freeze' pour ne pas
+--    compter dans les celebrations/exports comme une vraie coche,
+--    et pour limiter le nombre utilisable par mois (cf. dashboard.js,
+--    FREEZE_LIMITS - 1/mois Free, 4/mois Premium, verifie cote
+--    front uniquement : pas une regle de securite, juste un confort
+--    de motivation, donc pas de trigger dedie).
+-- ============================================================
+
+alter table public.habit_logs add column if not exists note text;
+alter table public.habit_logs add column if not exists source text not null default 'checkin' check (source in ('checkin', 'freeze'));

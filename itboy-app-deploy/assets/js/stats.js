@@ -50,7 +50,7 @@
 
   function renderStats(habits, logsByHabit, allDates, today) {
     var totalCheckins = allDates.length;
-    var bestStreak = habits.reduce(function (max, h) {
+    var bestStreak = habits.filter(function (h) { return h.frequency !== 'weekly'; }).reduce(function (max, h) {
       return Math.max(max, window.ITBOY.streak.computeCurrentStreak(logsByHabit[h.id] || [], today));
     }, 0);
     var avgRate7 = habits.length
@@ -72,14 +72,18 @@
       return (logsByHabit[b.id] || []).length - (logsByHabit[a.id] || []).length;
     }).map(function (h) {
       var dates = logsByHabit[h.id] || [];
-      var streak = window.ITBOY.streak.computeCurrentStreak(dates, today);
+      var isWeekly = h.frequency === 'weekly';
+      var streak = isWeekly
+        ? window.ITBOY.streak.computeWeeklyStreak(dates, h.frequency_per_week || 1, today)
+        : window.ITBOY.streak.computeCurrentStreak(dates, today);
+      var streakLabel = isWeekly ? 'Semaines' : 'Streak';
       return '<a class="habit-summary-row" href="../habits/?id=' + h.id + '">' +
         '<div class="info">' +
-        '<span class="name">' + window.ITBOY.ui.escapeHtml(h.name) + '</span>' +
+        '<span class="name">' + window.ITBOY.ui.escapeHtml(h.name) + (isWeekly ? ' <span class="link-muted" style="font-size:11px">· ' + (h.frequency_per_week || 1) + 'x/sem.</span>' : '') + '</span>' +
         '<span class="category">' + (window.ITBOY.CATEGORY_LABELS[h.category] || h.category) + '</span>' +
         '</div>' +
         '<div class="totals">' +
-        '<div class="metric"><div class="value">' + streak + '</div><div class="label">Streak</div></div>' +
+        '<div class="metric"><div class="value">' + streak + '</div><div class="label">' + streakLabel + '</div></div>' +
         '<div class="metric"><div class="value">' + dates.length + '</div><div class="label">Coches</div></div>' +
         '</div>' +
         '</a>';

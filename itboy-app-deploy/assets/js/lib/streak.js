@@ -69,11 +69,98 @@
     return Math.round((count / days) * 100);
   }
 
+  // --- Habitudes "X fois par semaine" (frequency === 'weekly') ---
+  // Le streak quotidien (computeCurrentStreak) n'a pas de sens pour ces
+  // habitudes : rater un jour n'est pas un echec si l'objectif de la
+  // semaine est deja atteint. Les fonctions ci-dessous raisonnent en
+  // semaines (lundi -> dimanche) plutot qu'en jours consecutifs.
+
+  // Lundi de la semaine contenant dateStr, au format YYYY-MM-DD.
+  function weekMonday(dStr) {
+    var d = toDate(dStr);
+    var dow = d.getDay(); // 0 = dim ... 6 = sam
+    var offset = dow === 0 ? 6 : dow - 1;
+    d.setDate(d.getDate() - offset);
+    return dateStr(d);
+  }
+
+  function completionsInWeek(completedDates, mondayStr) {
+    var monday = toDate(mondayStr);
+    var sunday = new Date(monday);
+    sunday.setDate(monday.getDate() + 6);
+    var sundayStr = dateStr(sunday);
+    return completedDates.filter(function (d) { return d >= mondayStr && d <= sundayStr; }).length;
+  }
+
+  // Nombre de coches sur la semaine en cours (lundi -> aujourd'hui).
+  function completionsThisWeek(completedDates, todayStr) {
+    todayStr = todayStr || dateStr(new Date());
+    return completionsInWeek(completedDates, weekMonday(todayStr));
+  }
+
+  // Nombre de semaines consecutives (en remontant depuis la derniere
+  // semaine terminee, ou la semaine en cours si l'objectif est deja
+  // atteint) ou le nombre de coches >= target. Une semaine en cours
+  // qui n'a pas encore atteint l'objectif n'est ni comptee ni cassante
+  // (elle n'est pas terminee) : on l'ignore et on part de la semaine
+  // precedente.
+  function computeWeeklyStreak(completedDates, target, todayStr) {
+    todayStr = todayStr || dateStr(new Date());
+    target = target || 1;
+    var today = toDate(todayStr);
+    var weekFinished = today.getDay() === 0; // dimanche = derniere coche possible de la semaine
+    var cursorMonday = weekMonday(todayStr);
+
+    if (weekFinished && completionsInWeek(completedDates, cursorMonday) >= target) {
+      // semaine en cours (terminee) comptee normalement, rien a faire
+    } else {
+      var m = toDate(cursorMonday);
+      m.setDate(m.getDate() - 7);
+      cursorMonday = dateStr(m);
+    }
+
+    var streak = 0;
+    while (completionsInWeek(completedDates, cursorMonday) >= target) {
+      streak += 1;
+      var mm = toDate(cursorMonday);
+      mm.setDate(mm.getDate() - 7);
+      cursorMonday = dateStr(mm);
+    }
+    return streak;
+  }
+
+  // Meilleure serie de semaines consecutives >= target, sur tout l'historique.
+  function computeBestWeeklyStreak(completedDates, target) {
+    if (!completedDates.length) return 0;
+    target = target || 1;
+    var sorted = Array.from(new Set(completedDates)).sort();
+    var cursor = toDate(weekMonday(sorted[0]));
+    var end = toDate(weekMonday(sorted[sorted.length - 1]));
+    var best = 0;
+    var current = 0;
+    while (cursor <= end) {
+      var mStr = dateStr(cursor);
+      if (completionsInWeek(completedDates, mStr) >= target) {
+        current += 1;
+        if (current > best) best = current;
+      } else {
+        current = 0;
+      }
+      cursor.setDate(cursor.getDate() + 7);
+    }
+    return best;
+  }
+
   global.ITBOY = global.ITBOY || {};
   global.ITBOY.streak = {
     computeCurrentStreak: computeCurrentStreak,
     computeBestStreak: computeBestStreak,
     completionRate: completionRate,
+    weekMonday: weekMonday,
+    completionsInWeek: completionsInWeek,
+    completionsThisWeek: completionsThisWeek,
+    computeWeeklyStreak: computeWeeklyStreak,
+    computeBestWeeklyStreak: computeBestWeeklyStreak,
     _dateStr: dateStr // exposé pour le calendrier heatmap
   };
 })(window);

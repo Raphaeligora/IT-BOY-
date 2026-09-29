@@ -8,6 +8,7 @@
   var statsEl = document.getElementById('habit-stats');
   var heatmapEl = document.getElementById('heatmap');
   var heatmapMonthsEl = document.getElementById('heatmap-months');
+  var noteZoneEl = document.getElementById('note-zone');
 
   var MONTH_ABBR = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Août', 'Sep', 'Oct', 'Nov', 'Déc'];
 
@@ -247,6 +248,56 @@
     }
   }
 
+  // Note libre du jour (si coche aujourd'hui) + dernieres notes
+  // laissees sur cette habitude. Le champ ne peut modifier que la
+  // coche du jour : habit_logs.note se rattache a une coche existante
+  // (voir api.updateLogNote), pas de creation de ligne depuis ici.
+  function renderNoteZone(habitId, logs, todayStr) {
+    if (!noteZoneEl) return;
+    var todayLog = logs.find(function (l) { return l.completed_date === todayStr; });
+    var pastNotes = logs.filter(function (l) { return l.completed_date !== todayStr && l.note; })
+      .slice().sort(function (a, b) { return a.completed_date < b.completed_date ? 1 : -1; })
+      .slice(0, 5);
+
+    var html = '<div class="detailed-stats-heading">Note du jour</div>';
+    if (todayLog) {
+      html += '<form class="form" id="note-form" style="margin-bottom:20px">' +
+        '<textarea class="form-input" id="note-input" rows="2" maxlength="500" placeholder="Un mot sur aujourd\'hui (facultatif)…">' + window.ITBOY.ui.escapeHtml(todayLog.note || '') + '</textarea>' +
+        '<button class="cta-btn ghost" type="submit" style="margin-top:8px;align-self:flex-start">Enregistrer</button>' +
+        '</form>';
+    } else {
+      html += '<p class="plan-note" style="margin-bottom:20px">Coche l\'habitude aujourd\'hui pour pouvoir y ajouter une note.</p>';
+    }
+
+    if (pastNotes.length) {
+      html += '<div class="detailed-stats-heading" style="margin-top:4px">Notes récentes</div>' +
+        '<div class="note-log-list">' + pastNotes.map(function (l) {
+          return '<div class="note-log-row"><span class="note-log-date">' + l.completed_date + '</span><span class="note-log-text">' + window.ITBOY.ui.escapeHtml(l.note) + '</span></div>';
+        }).join('') + '</div>';
+    }
+
+    noteZoneEl.innerHTML = html;
+
+    var form = document.getElementById('note-form');
+    if (form) {
+      form.addEventListener('submit', async function (e) {
+        e.preventDefault();
+        var input = document.getElementById('note-input');
+        var submitBtn = form.querySelector('button[type="submit"]');
+        submitBtn.disabled = true;
+        try {
+          await window.ITBOY.api.updateLogNote(habitId, todayStr, input.value.trim());
+          todayLog.note = input.value.trim();
+          window.ITBOY.ui.showToast('Note enregistrée.');
+        } catch (err) {
+          window.ITBOY.ui.showError(bannerZone, err);
+        } finally {
+          submitBtn.disabled = false;
+        }
+      });
+    }
+  }
+
   async function init() {
     if (!window.ITBOY.isSupabaseConfigured) {
       window.ITBOY.ui.showConfigBanner(bannerZone);
@@ -281,16 +332,31 @@
       // Le streak/taux se calcule TOUJOURS sur l'historique complet, même en
       // Free : la limite d'affichage ne doit jamais fausser un vrai streak
       // de plus de 30 jours (voir note dans plans.js).
-      var current = window.ITBOY.streak.computeCurrentStreak(dates, today);
-      var best = window.ITBOY.streak.computeBestStreak(dates);
-      var rate7 = window.ITBOY.streak.completionRate(dates, 7, today);
       var rate30 = window.ITBOY.streak.completionRate(dates, 30, today);
+      var isWeekly = habit.frequency === 'weekly';
 
-      statsEl.innerHTML =
-        statTile(current, 'Streak actuel') +
-        statTile(best, 'Meilleur streak') +
-        statTile(rate7 + '%', 'Sur 7 jours') +
-        statTile(rate30 + '%', 'Sur 30 jours');
+      if (isWeekly) {
+        var target = habit.frequency_per_week || 1;
+        var weekCount = window.ITBOY.streak.completionsThisWeek(dates, today);
+        var weeklyStreak = window.ITBOY.streak.computeWeeklyStreak(dates, target, today);
+        var bestWeekly = window.ITBOY.streak.computeBestWeeklyStreak(dates, target);
+        statsEl.innerHTML =
+          statTile(weeklyStreak, 'Semaines d\'affilée') +
+          statTile(bestWeekly, 'Meilleure série') +
+          statTile(weekCount + '/' + target, 'Cette semaine') +
+          statTile(rate30 + '%', 'Sur 30 jours');
+      } else {
+        var current = window.ITBOY.streak.computeCurrentStreak(dates, today);
+        var best = window.ITBOY.streak.computeBestStreak(dates);
+        var rate7 = window.ITBOY.streak.completionRate(dates, 7, today);
+        statsEl.innerHTML =
+          statTile(current, 'Streak actuel') +
+          statTile(best, 'Meilleur streak') +
+          statTile(rate7 + '%', 'Sur 7 jours') +
+          statTile(rate30 + '%', 'Sur 30 jours');
+      }
+
+      renderNoteZone(habitId, logs, today);
 
       var weeksToShow = isPremium ? 53 : 5;
       renderYearHeatmap(dates, weeksToShow);
