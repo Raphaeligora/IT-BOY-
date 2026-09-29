@@ -8,10 +8,18 @@
    (clic CTA landing -> signup -> premier habitude -> plan choisi).
    Pas un identifiant de session applicatif (contrairement à l'ancien
    quiz_session id) : sert uniquement à l'analyse, jamais lu par le reste
-   de l'app. */
+   de l'app.
+
+   Exclusion du proprietaire : cet outil mesure les VISITEURS/UTILISATEURS,
+   pas mon propre usage du produit en le testant/utilisant au quotidien.
+   Des qu'une session connectee avec le compte proprietaire est detectee,
+   ce navigateur est marque (localStorage) et n'est plus jamais tracke,
+   meme en navigation deconnectee ensuite (landing page, etc). */
 
 (function (global) {
   var ANON_ID_KEY = 'itboy_anon_id';
+  var OWNER_DEVICE_KEY = 'itboy_owner_device';
+  var OWNER_EMAIL = 'raphaeligora@gmail.com';
 
   function getAnonId() {
     try {
@@ -28,10 +36,19 @@
     }
   }
 
+  function isOwnerDevice() {
+    try { return localStorage.getItem(OWNER_DEVICE_KEY) === '1'; } catch (e) { return false; }
+  }
+
+  function markOwnerDevice() {
+    try { localStorage.setItem(OWNER_DEVICE_KEY, '1'); } catch (e) { /* ignore */ }
+  }
+
   // track(name, meta?, userId?) — ne jamais attendre (await) cet appel
   // avant une navigation : il ne doit jamais retarder le parcours.
   async function track(name, meta, userId) {
     if (!global.ITBOY || !global.ITBOY.isSupabaseConfigured || !global.ITBOY.supabase) return;
+    if (isOwnerDevice()) return; // proprietaire : jamais compte dans les stats
     try {
       var row = { name: name, meta: meta || {}, anon_id: getAnonId() };
       if (userId) row.user_id = userId;
@@ -50,13 +67,19 @@
   // best-effort, jamais bloquant. user_id recupere de facon async via
   // getSession() (deja en cache localement par supabase-js, donc rapide
   // et sans requete reseau) pour relier les vues aux comptes connectes
-  // sans dupliquer la logique auth de chaque page.
+  // sans dupliquer la logique auth de chaque page. C'est aussi ici que
+  // le compte proprietaire est detecte (voir markOwnerDevice ci-dessus).
   function trackPageView() {
     if (!global.ITBOY || !global.ITBOY.isSupabaseConfigured || !global.ITBOY.supabase) return;
+    if (isOwnerDevice()) return;
     var meta = { path: global.location.pathname, referrer: document.referrer || null };
     global.ITBOY.supabase.auth.getSession().then(function (res) {
-      var userId = res && res.data && res.data.session && res.data.session.user ? res.data.session.user.id : null;
-      track('page_view', meta, userId);
+      var sessionUser = res && res.data && res.data.session && res.data.session.user;
+      if (sessionUser && (sessionUser.email || '').toLowerCase() === OWNER_EMAIL) {
+        markOwnerDevice();
+        return; // ne compte pas non plus cette vue-la
+      }
+      track('page_view', meta, sessionUser ? sessionUser.id : null);
     }).catch(function () { track('page_view', meta); });
   }
 
