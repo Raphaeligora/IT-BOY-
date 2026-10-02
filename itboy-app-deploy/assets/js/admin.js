@@ -83,17 +83,33 @@
 
     window.ITBOY.ui.showLoading(zone);
 
-    var res = await window.ITBOY.supabase
-      .from('events')
-      .select('name, meta, anon_id, created_at')
-      .order('created_at', { ascending: false })
-      .limit(5000);
+    var results = await Promise.all([
+      window.ITBOY.supabase
+        .from('events')
+        .select('name, meta, anon_id, created_at')
+        .order('created_at', { ascending: false })
+        .limit(5000),
+      // profiles_select_owner (voir supabase/schema.sql section 12) est ce
+      // qui permet de lire TOUS les profils ici, pas seulement le sien.
+      window.ITBOY.supabase
+        .from('profiles')
+        .select('email, plan, created_at')
+        .order('created_at', { ascending: false })
+        .limit(2000)
+    ]);
+    var res = results[0];
+    var profilesRes = results[1];
 
     if (res.error) {
       window.ITBOY.ui.showError(bannerZone, res.error);
       zone.innerHTML = '';
       return;
     }
+    // La policy profiles_select_owner peut ne pas encore avoir ete appliquee
+    // (migration a executer manuellement, voir schema.sql section 12) : on
+    // ne bloque pas tout le dashboard pour autant, la section inscriptions
+    // sera juste vide avec un message d'erreur dedie.
+    var profiles = profilesRes.error ? [] : (profilesRes.data || []);
 
     var events = res.data || [];
     var pageViews = events.filter(function (e) { return e.name === 'page_view'; });
@@ -128,8 +144,33 @@
     });
 
     var recent = events.slice(0, 40);
+    var recentSignups = profiles.slice(0, 15);
 
     zone.innerHTML =
+      '<div class="detailed-stats-heading" style="margin-top:0">Inscriptions</div>' +
+      (profilesRes.error
+        ? '<div class="chart-card"><p class="empty-state" style="padding:12px 0">Impossible de lire les profils (' + window.ITBOY.ui.escapeHtml(profilesRes.error.message || 'erreur inconnue') + '). La policy "profiles_select_owner" a-t-elle bien ete executee dans le SQL editor ?</p></div>'
+        : '<div class="detailed-stats-grid">' +
+          '<div class="stat-tile"><div class="value">' + profiles.length + '</div><div class="label">Inscrits au total</div></div>' +
+          '<div class="stat-tile"><div class="value">' + countSince(profiles, 24) + '</div><div class="label">Inscrits / 24h</div></div>' +
+          '<div class="stat-tile"><div class="value">' + countSince(profiles, 24 * 7) + '</div><div class="label">Inscrits / 7 jours</div></div>' +
+          '<div class="stat-tile"><div class="value">' + profiles.filter(function (p) { return p.plan === 'premium'; }).length + '</div><div class="label">En Premium</div></div>' +
+          '</div>' +
+          '<div class="chart-card" style="padding:0;overflow:hidden;margin-top:6px">' +
+          (recentSignups.length
+            ? '<div style="max-height:360px;overflow-y:auto">' +
+              recentSignups.map(function (p) {
+                var when = new Date(p.created_at).toLocaleString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+                return '<div style="display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 20px;border-top:1px solid rgba(246,246,246,0.06);font-size:13px">' +
+                  '<span style="color:var(--white)">' + window.ITBOY.ui.escapeHtml(p.email || '(email inconnu)') + (p.plan === 'premium' ? ' <span class="link-muted" style="color:var(--gold)">· premium</span>' : '') + '</span>' +
+                  '<span class="link-muted" style="white-space:nowrap">' + when + '</span>' +
+                  '</div>';
+              }).join('') +
+              '</div>'
+            : '<p class="empty-state" style="padding:20px">Aucun inscrit pour l\'instant.</p>') +
+          '</div>') +
+
+      '<div class="detailed-stats-heading" style="margin-top:28px">Vues</div>' +
       '<div class="detailed-stats-grid">' +
       '<div class="stat-tile"><div class="value">' + pageViews.length + '</div><div class="label">Vues (5000 derniers évènements)</div></div>' +
       '<div class="stat-tile"><div class="value">' + countSince(pageViews, 24) + '</div><div class="label">Vues / 24h</div></div>' +
