@@ -96,6 +96,51 @@
   </form>
 </div>
 
+<!-- ============ MODALE : modifier une habitude (via le swipe mobile) ============ -->
+<div class="modal-overlay" id="edit-habit-modal" hidden>
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="edit-habit-title">
+    <button type="button" class="pwa-modal-close" id="edit-habit-close" aria-label="Fermer">&times;</button>
+    <h3 id="edit-habit-title" class="font-cinzel">Modifier l'habitude</h3>
+    <form class="form" id="edit-habit-form" style="margin-top:18px">
+      <label class="form-label">Nom
+        <input class="form-input" type="text" name="name" required />
+      </label>
+      <label class="form-label">Domaine
+        <select class="form-select" name="category" required>
+          <option value="sante">Sante</option>
+          <option value="productivite">Productivite</option>
+          <option value="mindset">Mindset &amp; discipline</option>
+          <option value="finance">Finances</option>
+        </select>
+      </label>
+      <label class="form-label">Description <span class="link-muted" style="font-weight:400">(optionnel)</span>
+        <textarea class="form-input" name="description" rows="2" maxlength="240"></textarea>
+      </label>
+      <label class="form-label">Couleur
+        <div class="color-picker" id="edit-color-picker">
+          <button type="button" class="color-swatch" data-color="#CDA34E" style="background:#CDA34E" aria-label="Or"></button>
+          <button type="button" class="color-swatch" data-color="#7FB3D5" style="background:#7FB3D5" aria-label="Bleu"></button>
+          <button type="button" class="color-swatch" data-color="#8FC1A9" style="background:#8FC1A9" aria-label="Vert"></button>
+          <button type="button" class="color-swatch" data-color="#D98880" style="background:#D98880" aria-label="Corail"></button>
+          <button type="button" class="color-swatch" data-color="#C39BD3" style="background:#C39BD3" aria-label="Violet"></button>
+          <button type="button" class="color-swatch" data-color="#F0B27A" style="background:#F0B27A" aria-label="Ambre"></button>
+        </div>
+        <input type="hidden" name="color" id="edit-color-input" value="#CDA34E" />
+      </label>
+      <label class="form-label" id="edit-frequency-wrap">Frequence
+        <select class="form-select" name="frequency" id="edit-frequency-select">
+          <option value="daily">Quotidienne</option>
+          <option value="weekly">X fois par semaine</option>
+        </select>
+      </label>
+      <label class="form-label" id="edit-frequency-count-label" style="display:none">Fois par semaine
+        <input class="form-input" type="number" name="frequencyPerWeek" min="1" max="7" value="3" />
+      </label>
+      <button class="cta-btn" type="submit" style="width:100%;margin-top:6px">Enregistrer</button>
+    </form>
+  </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="../assets/js/lib/config.js"></script>
 <script src="../assets/js/lib/supabaseClient.js"></script>

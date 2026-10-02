@@ -1136,6 +1136,79 @@ button.action-chip:disabled { opacity: 0.5; cursor: not-allowed; transform: none
 .pwa-modal-platform ol { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 4px; }
 .pwa-modal-platform li { font-size: 13px; line-height: 1.55; color: var(--white); }
 
+/* Modale generique (reutilise le meme habillage que .pwa-modal-overlay /
+   .pwa-modal ci-dessus, sous un nom neutre pour servir a autre chose que
+   l'install PWA — ex. modifier une habitude via le swipe mobile). */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: rgba(6,11,20,0.72);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.modal-overlay[hidden] { display: none; }
+.modal-card {
+  position: relative;
+  width: 100%;
+  max-width: 420px;
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
+  background: linear-gradient(155deg, var(--bg-card-2) 0%, var(--bg-card) 55%, #0D1727 100%);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 50px 100px -35px rgba(0,0,0,0.85);
+  padding: 30px 26px 26px;
+}
+.modal-card h3 { font-size: 20px; font-weight: 600; color: var(--white); margin: 0; padding-right: 24px; }
+
+/* Carte d'habitude "glissable" sur mobile/PWA : swipe vers la droite pour
+   reveler 3 actions rondes (valider / modifier / detail) cachees derriere
+   la carte. Desktop/souris : inchange, .habit-row garde ses boutons
+   habituels (archiver, detail en lien texte...), le swipe s'ajoute en plus
+   sans rien retirer. */
+.habit-swipe { position: relative; overflow: hidden; border-radius: var(--radius-md); }
+.habit-swipe .habit-row {
+  position: relative;
+  z-index: 1;
+  transition: transform 0.25s cubic-bezier(0.22, 0.68, 0, 1);
+  touch-action: pan-y;
+}
+.habit-swipe.dragging .habit-row { transition: none; }
+.habit-swipe-actions {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  display: none;
+  align-items: center;
+  gap: 12px;
+  padding-left: 20px;
+}
+.swipe-action {
+  flex: none;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  border: 1px solid var(--line-strong);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: 0 10px 20px -12px rgba(0,0,0,0.6);
+  transition: transform 0.15s;
+}
+.swipe-action:active { transform: scale(0.88); }
+.swipe-action.validate { background: linear-gradient(135deg, var(--gold-bright), var(--gold)); border-color: transparent; color: var(--bg-deep); }
+.swipe-action.edit, .swipe-action.detail { background: var(--bg-card-2); color: var(--white); }
+@media (max-width: 720px) {
+  .habit-swipe-actions { display: flex; }
+}
+
 .locked-card {
   width: 100%;
   background: linear-gradient(155deg, rgba(205,163,78,0.05), transparent 60%);

@@ -67,6 +67,22 @@
           return res.data;
    }
 
+   // Edition d'une habitude existante (nom, domaine, description, couleur,
+   // frequence) - jamais le type (habit/tracker), qui conditionne le sens
+   // des logs et des stats deja enregistres, donc pas modifiable apres coup.
+   async function updateHabit(habitId, fields) {
+          var payload = {};
+          if (fields.name !== undefined) payload.name = fields.name;
+          if (fields.category !== undefined) payload.category = fields.category;
+          if (fields.description !== undefined) payload.description = fields.description || null;
+          if (fields.color !== undefined) payload.color = fields.color || null;
+          if (fields.frequency !== undefined) payload.frequency = fields.frequency;
+          if (fields.frequencyPerWeek !== undefined) payload.frequency_per_week = fields.frequencyPerWeek;
+          var res = await db().from('habits').update(payload).eq('id', habitId).select().single();
+          if (res.error) throw res.error;
+          return res.data;
+   }
+
    async function archiveHabit(habitId) {
           var res = await db().from('habits').update({ archived: true }).eq('id', habitId);
           if (res.error) throw res.error;
@@ -162,6 +178,7 @@
             getArchivedHabits: getArchivedHabits,
             getHabit: getHabit,
             createHabit: createHabit,
+            updateHabit: updateHabit,
             archiveHabit: archiveHabit,
             reactivateHabit: reactivateHabit,
             reorderHabits: reorderHabits,

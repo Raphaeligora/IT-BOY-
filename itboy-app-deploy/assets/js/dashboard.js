@@ -19,6 +19,16 @@
   var colorPicker = document.getElementById('color-picker');
   var colorInput = document.getElementById('color-input');
 
+  var editModal = document.getElementById('edit-habit-modal');
+  var editForm = document.getElementById('edit-habit-form');
+  var editCloseBtn = document.getElementById('edit-habit-close');
+  var editColorPicker = document.getElementById('edit-color-picker');
+  var editColorInput = document.getElementById('edit-color-input');
+  var editFrequencySelect = document.getElementById('edit-frequency-select');
+  var editFrequencyCountLabel = document.getElementById('edit-frequency-count-label');
+  var editFrequencyWrap = document.getElementById('edit-frequency-wrap');
+  var editingHabitId = null;
+
   var sortToggleEl = document.getElementById('sort-toggle');
   var greetingEl = document.getElementById('greeting');
   var nudgeEl = document.getElementById('evening-nudge');
@@ -252,7 +262,13 @@
           '"' + (canFreeze ? '' : ' disabled') + '>❄️</button>'
         : '';
 
-      return '<div class="habit-row' + (manual ? ' draggable' : '') + '" data-habit-id="' + h.id + '" style="--habit-accent:' + accent + '"' + (manual ? ' draggable="true"' : '') + '>' +
+      return '<div class="habit-swipe" data-habit-id="' + h.id + '">' +
+        '<div class="habit-swipe-actions">' +
+        '<button type="button" class="swipe-action validate" data-swipe-action="toggle" aria-label="Valider">✓</button>' +
+        '<button type="button" class="swipe-action edit" data-swipe-action="edit" aria-label="Modifier">✏️</button>' +
+        '<button type="button" class="swipe-action detail" data-swipe-action="detail" aria-label="Detail">👁</button>' +
+        '</div>' +
+        '<div class="habit-row' + (manual ? ' draggable' : '') + '" data-habit-id="' + h.id + '" style="--habit-accent:' + accent + '"' + (manual ? ' draggable="true"' : '') + '>' +
         (manual ? '<span class="drag-handle" aria-hidden="true">⠿</span>' : '') +
         '<button class="habit-checkbox' + (doneToday ? ' done' : '') + '" data-action="toggle" aria-label="Fait aujourd\'hui"></button>' +
         '<div class="info">' +
@@ -264,6 +280,7 @@
         freezeBtn +
         '<a class="detail-link" href="../habits/?id=' + h.id + '">Detail</a>' +
         '<button class="archive-btn" data-action="archive">Archiver</button>' +
+        '</div>' +
         '</div>';
     }).join('');
 
@@ -278,6 +295,187 @@
     });
 
     if (manual) bindDragAndDrop();
+    bindSwipeActions();
+  }
+
+  // Swipe mobile (tactile uniquement, @media max-width:720px cote CSS) :
+  // glisser une carte vers la droite revele 3 actions rondes cachees
+  // derriere (valider / modifier / detail). Implementation main vanille
+  // (touch events), pas de librairie - l'interaction reste simple (un seul
+  // axe, une seule position ouverte a la fois).
+  var SWIPE_OPEN_X = 162;
+  var openSwipeWrap = null;
+
+  function closeSwipe(wrap) {
+    if (!wrap) return;
+    var row = wrap.querySelector('.habit-row');
+    if (row) row.style.transform = 'translateX(0px)';
+    wrap.classList.remove('swiped');
+    if (openSwipeWrap === wrap) openSwipeWrap = null;
+  }
+
+  function bindSwipeActions() {
+    listEl.querySelectorAll('.habit-swipe').forEach(function (wrap) {
+      var row = wrap.querySelector('.habit-row');
+      if (!row) return;
+      var startX = 0, startY = 0, baseX = 0, dragging = false, decided = false, horizontal = false;
+
+      row.addEventListener('touchstart', function (e) {
+        if (e.touches.length !== 1) return;
+        startX = e.touches[0].clientX;
+        startY = e.touches[0].clientY;
+        baseX = wrap.classList.contains('swiped') ? SWIPE_OPEN_X : 0;
+        dragging = true;
+        decided = false;
+        horizontal = false;
+        wrap.classList.add('dragging');
+      }, { passive: true });
+
+      row.addEventListener('touchmove', function (e) {
+        if (!dragging) return;
+        var dx = e.touches[0].clientX - startX;
+        var dy = e.touches[0].clientY - startY;
+        if (!decided && (Math.abs(dx) > 8 || Math.abs(dy) > 8)) {
+          decided = true;
+          horizontal = Math.abs(dx) > Math.abs(dy);
+          if (horizontal && openSwipeWrap && openSwipeWrap !== wrap) closeSwipe(openSwipeWrap);
+        }
+        if (!horizontal) return;
+        e.preventDefault();
+        var next = Math.max(0, Math.min(SWIPE_OPEN_X, baseX + dx));
+        row.style.transform = 'translateX(' + next + 'px)';
+      }, { passive: false });
+
+      row.addEventListener('touchend', function () {
+        if (!dragging) return;
+        dragging = false;
+        wrap.classList.remove('dragging');
+        if (!horizontal) return;
+        var match = /translateX\(([-\d.]+)px\)/.exec(row.style.transform || '');
+        var x = match ? parseFloat(match[1]) : 0;
+        if (x > SWIPE_OPEN_X / 2) {
+          row.style.transform = 'translateX(' + SWIPE_OPEN_X + 'px)';
+          wrap.classList.add('swiped');
+          openSwipeWrap = wrap;
+        } else {
+          closeSwipe(wrap);
+        }
+      });
+
+      wrap.querySelectorAll('[data-swipe-action]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var habitId = wrap.getAttribute('data-habit-id');
+          var action = btn.getAttribute('data-swipe-action');
+          closeSwipe(wrap);
+          if (action === 'toggle') toggleToday(habitId);
+          else if (action === 'detail') window.location.href = '../habits/?id=' + habitId;
+          else if (action === 'edit') openEditModal(habitId);
+        });
+      });
+    });
+  }
+
+  // Fermer la carte ouverte si on tape ailleurs sur l'ecran.
+  document.addEventListener('touchstart', function (e) {
+    if (!openSwipeWrap) return;
+    if (!openSwipeWrap.contains(e.target)) closeSwipe(openSwipeWrap);
+  }, { passive: true });
+
+  // ---- Modifier une habitude (modale ouverte depuis l'action swipe) ----
+  function openEditModal(habitId) {
+    var habit = habits.find(function (h) { return h.id === habitId; });
+    if (!habit || !editModal || !editForm) return;
+    editingHabitId = habitId;
+
+    editForm.name.value = habit.name || '';
+    editForm.category.value = habit.category || 'sante';
+    if (editForm.description) editForm.description.value = habit.description || '';
+
+    var color = habit.color || '#CDA34E';
+    if (editColorInput) editColorInput.value = color;
+    if (editColorPicker) {
+      editColorPicker.querySelectorAll('.color-swatch').forEach(function (b) {
+        b.classList.toggle('active', b.getAttribute('data-color') === color);
+      });
+    }
+
+    var isTracker = habit.type === 'tracker';
+    if (editFrequencyWrap) editFrequencyWrap.style.display = isTracker ? 'none' : 'flex';
+    if (!isTracker && editFrequencySelect) {
+      editFrequencySelect.value = habit.frequency || 'daily';
+      if (editFrequencyCountLabel) editFrequencyCountLabel.style.display = habit.frequency === 'weekly' ? 'flex' : 'none';
+      if (editForm.frequencyPerWeek) editForm.frequencyPerWeek.value = habit.frequency_per_week || 3;
+    }
+
+    editModal.hidden = false;
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeEditModal() {
+    if (!editModal) return;
+    editModal.hidden = true;
+    document.body.style.overflow = '';
+    editingHabitId = null;
+  }
+
+  if (editCloseBtn) editCloseBtn.addEventListener('click', closeEditModal);
+  if (editModal) {
+    editModal.addEventListener('click', function (e) { if (e.target === editModal) closeEditModal(); });
+  }
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && editModal && !editModal.hidden) closeEditModal();
+  });
+
+  if (editColorPicker && editColorInput) {
+    editColorPicker.querySelectorAll('.color-swatch').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        editColorPicker.querySelectorAll('.color-swatch').forEach(function (b) { b.classList.toggle('active', b === btn); });
+        editColorInput.value = btn.getAttribute('data-color');
+      });
+    });
+  }
+
+  if (editFrequencySelect && editFrequencyCountLabel) {
+    editFrequencySelect.addEventListener('change', function () {
+      editFrequencyCountLabel.style.display = editFrequencySelect.value === 'weekly' ? 'flex' : 'none';
+    });
+  }
+
+  if (editForm) {
+    editForm.addEventListener('submit', async function (e) {
+      e.preventDefault();
+      if (!editingHabitId) return;
+      var habit = habits.find(function (h) { return h.id === editingHabitId; });
+      var isTracker = habit && habit.type === 'tracker';
+      var name = editForm.name.value.trim();
+      if (!name) return;
+
+      var fields = {
+        name: name,
+        category: editForm.category.value,
+        description: editForm.description ? editForm.description.value.trim() : '',
+        color: editColorInput ? editColorInput.value : null
+      };
+      if (!isTracker) {
+        fields.frequency = editForm.frequency.value;
+        fields.frequencyPerWeek = editForm.frequency.value === 'weekly' ? parseInt(editForm.frequencyPerWeek.value, 10) : null;
+      }
+
+      var submitBtn = editForm.querySelector('button[type="submit"]');
+      if (submitBtn) submitBtn.disabled = true;
+      try {
+        var updated = await window.ITBOY.api.updateHabit(editingHabitId, fields);
+        var idx = habits.findIndex(function (h) { return h.id === editingHabitId; });
+        if (idx !== -1) habits[idx] = updated;
+        closeEditModal();
+        renderHabitList();
+        window.ITBOY.ui.showToast('Habitude mise à jour.');
+      } catch (err) {
+        window.ITBOY.ui.showError(bannerZone, err);
+      } finally {
+        if (submitBtn) submitBtn.disabled = false;
+      }
+    });
   }
 
   // Utilise un jeton de freeze pour proteger la journee d'hier (non
