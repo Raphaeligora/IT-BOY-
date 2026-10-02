@@ -14,12 +14,26 @@
    pas mon propre usage du produit en le testant/utilisant au quotidien.
    Des qu'une session connectee avec le compte proprietaire est detectee,
    ce navigateur est marque (localStorage) et n'est plus jamais tracke,
-   meme en navigation deconnectee ensuite (landing page, etc). */
+   meme en navigation deconnectee ensuite (landing page, etc).
+
+   Exclusion des domaines de test : le flag ci-dessus est stocke en
+   localStorage, donc specifique a UN domaine. Un test fait sur une URL
+   de preview Vercel (ex: it-boy-git-xxx.vercel.app, utilisee pour
+   verifier une feature avant mise en prod) ou en local n'a jamais ce
+   flag pose, et serait donc compte comme un vrai visiteur. On bloque
+   ca a la racine : aucun tracking n'est jamais envoye en dehors du
+   vrai domaine de prod, quel que soit l'appareil ou la session. */
 
 (function (global) {
   var ANON_ID_KEY = 'itboy_anon_id';
   var OWNER_DEVICE_KEY = 'itboy_owner_device';
   var OWNER_EMAIL = 'raphaeligora@gmail.com';
+  var PROD_HOSTNAME = 'it-boy.vercel.app';
+
+  function isTestEnvironment() {
+    var h = (global.location && global.location.hostname || '').toLowerCase();
+    return h !== PROD_HOSTNAME;
+  }
 
   function getAnonId() {
     try {
@@ -48,6 +62,7 @@
   // avant une navigation : il ne doit jamais retarder le parcours.
   async function track(name, meta, userId) {
     if (!global.ITBOY || !global.ITBOY.isSupabaseConfigured || !global.ITBOY.supabase) return;
+    if (isTestEnvironment()) return; // preview/local : jamais un vrai visiteur
     if (isOwnerDevice()) return; // proprietaire : jamais compte dans les stats
     try {
       var row = { name: name, meta: meta || {}, anon_id: getAnonId() };
@@ -71,6 +86,7 @@
   // le compte proprietaire est detecte (voir markOwnerDevice ci-dessus).
   function trackPageView() {
     if (!global.ITBOY || !global.ITBOY.isSupabaseConfigured || !global.ITBOY.supabase) return;
+    if (isTestEnvironment()) return; // preview/local : jamais un vrai visiteur
     if (isOwnerDevice()) return;
     var meta = { path: global.location.pathname, referrer: document.referrer || null };
     global.ITBOY.supabase.auth.getSession().then(function (res) {
