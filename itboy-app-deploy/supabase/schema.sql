@@ -363,3 +363,32 @@ alter table public.habits add column if not exists color text;
 create policy "events_select_owner"
   on public.events for select
   using ((auth.jwt() ->> 'email') = 'raphaeligora@gmail.com');
+
+-- ============================================================
+-- 12. Rattrapage inscriptions (2026-10-02) - le trigger
+--     on_auth_user_created (section 1) cree deja une ligne profiles
+--     a chaque inscription, mais certains comptes plus anciens n'ont
+--     jamais ete rattrapes (profil manquant, ou email jamais
+--     synchronise). On repare les deux, et on permet au proprietaire
+--     de lire tous les profils (jusqu'ici "profiles_select_own" ne
+--     laissait chacun voir que le sien) pour pouvoir suivre les
+--     nouvelles inscriptions sans repasser par le SQL editor a chaque
+--     fois.
+-- ============================================================
+
+-- Cree le profil manquant pour tout compte auth.users qui n'en a pas.
+insert into public.profiles (id, plan, email, created_at)
+select u.id, 'free', u.email, u.created_at
+from auth.users u
+left join public.profiles p on p.id = u.id
+where p.id is null;
+
+-- Resynchronise l'email de tous les profils existants.
+update public.profiles p
+set email = u.email
+from auth.users u
+where p.id = u.id and (p.email is null or p.email <> u.email);
+
+create policy "profiles_select_owner"
+  on public.profiles for select
+  using ((auth.jwt() ->> 'email') = 'raphaeligora@gmail.com');
